@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.Validator;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequestMapping(value = "/users")
@@ -43,7 +43,7 @@ public class UserController {
     @PutMapping
     public User put(@RequestBody User user) {
         if (!users.containsKey(user.getId())) {
-            throw new NoSuchElementException();
+            throw new NoSuchUserException("Пользователь не найден - обновление невозможно.");
         }
         if (Validator.isValidated(user)) {
             log.debug("Обновлен пользователь: {}", user);

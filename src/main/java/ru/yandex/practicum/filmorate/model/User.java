@@ -1,9 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Email;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.With;
+import ru.yandex.practicum.filmorate.model.annotations.UserLoginValidation;
 
 import java.time.LocalDate;
 
@@ -11,11 +16,9 @@ import java.time.LocalDate;
 @Builder
 public class User {
 
-    @With
-    private int id;
-    @Email
-    private String email;
-    private String login;
-    private String name;
-    private LocalDate birthday;
+    @With private int id;
+    @NotNull @NotBlank @Email private String email;
+    @NotNull @NotBlank @UserLoginValidation private String login;
+    @With private String name;
+    @PastOrPresent private LocalDate birthday;
 }

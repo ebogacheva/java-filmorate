@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.Validator;
 
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,33 +25,37 @@ public class UserController {
     private final HashMap<Integer, User> users = new HashMap<>();
 
     @PostMapping
-    public User create(@RequestBody User user) {
-        if (Validator.isValidated(user)) {
-            int id = idProvider.incrementAndGet();
-            User userCreated = user.withId(id);
-            log.debug("Добавлен пользователь: {}", userCreated);
-            users.put(id, userCreated);
-            return userCreated;
-        }
-        return null;
+    public User create(@Valid @RequestBody User user) {
+        int id = idProvider.incrementAndGet();
+        String name = getCorrectName(user);
+        User userCreated = user.withId(id).withName(name);
+        log.debug("Добавлен пользователь: {}", userCreated);
+        users.put(id, userCreated);
+        return userCreated;
     }
 
     @GetMapping
     public List<User> findAll() {
-        return users.values().stream().toList();
+        return new ArrayList<>(users.values());
     }
 
     @PutMapping
-    public User put(@RequestBody User user) {
+    public User put(@Valid @RequestBody User user) {
         if (!users.containsKey(user.getId())) {
             throw new NoSuchUserException("Пользователь не найден - обновление невозможно.");
         }
-        if (Validator.isValidated(user)) {
-            log.debug("Обновлен пользователь: {}", user);
-            users.put(user.getId(), user);
-            return user;
-        }
-        return null;
+        String name = getCorrectName(user);
+        User userUpdated = user.withName(name);
+        log.debug("Обновлен пользователь: {}", userUpdated);
+        users.put(userUpdated.getId(), userUpdated);
+        return userUpdated;
     }
 
+    private String getCorrectName(User user) {
+        String name = user.getName();
+        if (name == null || name.isBlank()) {
+            name = user.getLogin();
+        }
+        return name;
+    }
 }

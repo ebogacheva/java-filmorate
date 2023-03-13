@@ -28,9 +28,15 @@ public class TestDataProvider {
                 .build();
     }
 
-    public static Film getFilmWithInvalidName() {
+    public static Film getFilmWithEmptyName() {
         Film film = getFilmWithValidData();
         film.setName(" ");
+        return film;
+    }
+
+    public static Film getFilmWithNullName() {
+        Film film = getFilmWithValidData();
+        film.setName(null);
         return film;
     }
 
@@ -73,6 +79,31 @@ public class TestDataProvider {
     public static User getUserWithInvalidEmail() {
         User user = getUserWithValidData();
         user.setEmail("namegmail.com");
+        return user;
+    }
+
+    public static User getUserWithInvalidLoginSpaces() {
+        User user = getUserWithValidData();
+        user.setLogin("login login");
+        return user;
+    }
+
+
+    public static User getUserWithNullLoginSpaces() {
+        User user = getUserWithValidData();
+        user.setLogin(null);
+        return user;
+    }
+
+    public static User getUserWithEmptyLoginSpaces() {
+        User user = getUserWithValidData();
+        user.setLogin("");
+        return user;
+    }
+
+    public static User getUserWithFutureBirthday() {
+        User user = getUserWithValidData();
+        user.setBirthday(LocalDate.of(9999, 12, 12));
         return user;
     }
 

@@ -11,32 +11,38 @@ import static org.junit.jupiter.api.Assertions.*;
 class ValidatorTest {
 
     @Test
-    void validateFilmWithValidData() {
+    void validateFilmWithValidDataOk() {
         Film film = TestDataProvider.getFilmWithValidData();
         boolean actual = Validator.isValidated(film);
         assertTrue(actual);
     }
 
     @Test
-    void validateFilmWithBlankName() {
-        Film film = TestDataProvider.getFilmWithInvalidName();
+    void validateFilmWithBlankNameException() {
+        Film film = TestDataProvider.getFilmWithEmptyName();
         assertThrows(ValidationException.class, () -> Validator.isValidated(film));
     }
 
     @Test
-    void validateFilmWithTooLongDescription() {
+    void validateFilmWithNullNameException() {
+        Film film = TestDataProvider.getFilmWithNullName();
+        assertThrows(ValidationException.class, () -> Validator.isValidated(film));
+    }
+
+    @Test
+    void validateFilmWithTooLongDescriptionException() {
         Film film = TestDataProvider.getFilmWithTooLongDescription();
         assertThrows(ValidationException.class, () -> Validator.isValidated(film));
     }
 
     @Test
-    void validateFilmReleaseInvalidDate() {
+    void validateFilmReleaseInvalidDateException() {
         Film film = TestDataProvider.getFilmWithInvalidReleaseDate();
         assertThrows(ValidationException.class, () -> Validator.isValidated(film));
     }
 
     @Test
-    void validateFilmReleaseExactStartFilmHistoryDate() {
+    void validateFilmReleaseExactStartFilmHistoryDateOk() {
         Film film = TestDataProvider.getFilmWithExactStartFilmHistoryDate();
         boolean actual = Validator.isValidated(film);
         assertTrue(actual);
@@ -69,6 +75,30 @@ class ValidatorTest {
     @Test
     void validateUserWithInvalidEmail() {
         User user = TestDataProvider.getUserWithInvalidEmail();
+        assertThrows(ValidationException.class, () -> Validator.isValidated(user));
+    }
+
+    @Test
+    void validateUserWithInvalidLoginSpacesException() {
+        User user = TestDataProvider.getUserWithInvalidLoginSpaces();
+        assertThrows(ValidationException.class, () -> Validator.isValidated(user));
+    }
+
+    @Test
+    void validateUserWithNullLoginException() {
+        User user = TestDataProvider.getUserWithNullLoginSpaces();
+        assertThrows(ValidationException.class, () -> Validator.isValidated(user));
+    }
+
+    @Test
+    void validateUserWithEmptyLoginException() {
+        User user = TestDataProvider.getUserWithEmptyLoginSpaces();
+        assertThrows(ValidationException.class, () -> Validator.isValidated(user));
+    }
+
+    @Test
+    void validateUserWithFutureBirthdayException() {
+        User user = TestDataProvider.getUserWithFutureBirthday();
         assertThrows(ValidationException.class, () -> Validator.isValidated(user));
     }
 }

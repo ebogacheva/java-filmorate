@@ -9,11 +9,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = ReleaseDateValidator.class)
+@Constraint(validatedBy = UserLoginValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ReleaseDateValidation {
-    String message() default "Invalid release date.";
+public @interface UserLoginValidation {
+    String message() default "Invalid user login.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

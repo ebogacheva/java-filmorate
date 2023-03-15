@@ -18,12 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @WebMvcTest(UserController.class)
 public class UserValidationTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private String valueAsString;
 
     @BeforeAll
     public static void beforeAll() {
-        objectMapper.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
     }
 
     @Autowired
@@ -44,10 +44,10 @@ public class UserValidationTest {
     @Test
     void shouldReturnOkForUserWithValidData() throws Exception {
         User user = TestDataProvider.getUserWithValidData();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.OK, postChecking(user));
         User userCreated = user.withId(1);
-        valueAsString = objectMapper.writeValueAsString(userCreated);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(userCreated);
         assertEquals(HttpStatus.OK, putChecking(user));
 
     }
@@ -55,7 +55,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithEmptyEmail() throws Exception {
         User user = TestDataProvider.getUserWithEmptyEmail();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -63,7 +63,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithNullEmail() throws Exception {
         User user = TestDataProvider.getUserWithNullEmail();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -71,7 +71,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithInvalidEmail() throws Exception {
         User user = TestDataProvider.getUserWithInvalidEmail();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -79,7 +79,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithInvalidLoginWithSpaces() throws Exception {
         User user = TestDataProvider.getUserWithInvalidLoginSpaces();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -87,7 +87,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithNullLogin() throws Exception {
         User user = TestDataProvider.getUserWithNullLoginSpaces();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -95,7 +95,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithEmptyLogin() throws Exception {
         User user = TestDataProvider.getUserWithEmptyLoginSpaces();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }
@@ -103,7 +103,7 @@ public class UserValidationTest {
     @Test
     void shouldReturnBadRequestForUserWithFutureBirthday() throws Exception {
         User user = TestDataProvider.getUserWithFutureBirthday();
-        valueAsString = objectMapper.writeValueAsString(user);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(user);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(user));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(user));
     }

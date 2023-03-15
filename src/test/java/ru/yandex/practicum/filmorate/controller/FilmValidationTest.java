@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @WebMvcTest(FilmController.class)
 class FilmValidationTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private String valueAsString;
 
     @BeforeAll
     public static void beforeAll() {
-        objectMapper.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
     }
 
     @Autowired
@@ -45,17 +45,17 @@ class FilmValidationTest {
     @Test
     void shouldReturnOkCodeForValidData() throws Exception {
         Film film = TestDataProvider.getFilmWithValidData();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.OK, postChecking(film));
         Film filmCreated = film.withId(1);
-        valueAsString = objectMapper.writeValueAsString(filmCreated);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(filmCreated);
         assertEquals(HttpStatus.OK, putChecking(film));
     }
 
     @Test
     void shouldReturnBadRequestCodeForEmptyName() throws Exception {
         Film film = TestDataProvider.getFilmWithEmptyName();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(film));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(film));
     }
@@ -63,7 +63,7 @@ class FilmValidationTest {
     @Test
     void shouldReturnBadRequestCodeForNullName() throws Exception {
         Film film = TestDataProvider.getFilmWithNullName();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(film));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(film));
     }
@@ -71,7 +71,7 @@ class FilmValidationTest {
     @Test
     void shouldReturnBadRequestCodeForTooLongDescription() throws Exception {
         Film film = TestDataProvider.getFilmWithTooLongDescription();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(film));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(film));
     }
@@ -79,7 +79,7 @@ class FilmValidationTest {
     @Test
     void shouldReturnBadRequestCodeForInvalidDate() throws Exception {
         Film film = TestDataProvider.getFilmWithInvalidReleaseDate();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(film));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(film));
     }
@@ -88,7 +88,7 @@ class FilmValidationTest {
     @Test
     void shouldReturnOkForExactStartFilmHistoryDate() throws Exception {
         Film film = TestDataProvider.getFilmWithExactStartFilmHistoryDate();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.OK, postChecking(film));
         assertEquals(HttpStatus.NOT_FOUND, putChecking(film));
     }
@@ -96,7 +96,7 @@ class FilmValidationTest {
     @Test
     void validateFilmWithInvalidDuration() throws Exception {
         Film film = TestDataProvider.getFilmWithInvalidDuration();
-        valueAsString = objectMapper.writeValueAsString(film);
+        valueAsString = OBJECT_MAPPER.writeValueAsString(film);
         assertEquals(HttpStatus.BAD_REQUEST, postChecking(film));
         assertEquals(HttpStatus.BAD_REQUEST, putChecking(film));
     }

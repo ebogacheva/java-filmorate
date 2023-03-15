@@ -13,8 +13,7 @@ class ValidatorTest {
     @Test
     void validateFilmWithValidDataOk() {
         Film film = TestDataProvider.getFilmWithValidData();
-        boolean actual = Validator.isValidated(film);
-        assertTrue(actual);
+        assertDoesNotThrow(() -> Validator.isValidated(film));
     }
 
     @Test
@@ -44,8 +43,7 @@ class ValidatorTest {
     @Test
     void validateFilmReleaseExactStartFilmHistoryDateOk() {
         Film film = TestDataProvider.getFilmWithExactStartFilmHistoryDate();
-        boolean actual = Validator.isValidated(film);
-        assertTrue(actual);
+        assertDoesNotThrow(() -> Validator.isValidated(film));
     }
 
     @Test
@@ -56,8 +54,7 @@ class ValidatorTest {
     @Test
     void validatedUserWithValidData() {
         User user = TestDataProvider.getUserWithValidData();
-        boolean actual = Validator.isValidated(user);
-        assertTrue(actual);
+        assertDoesNotThrow(() -> Validator.isValidated(user));
     }
 
     @Test

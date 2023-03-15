@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Slf4j
 public class Validator {
@@ -18,9 +19,9 @@ public class Validator {
     private static final String DESCRIPTION_INVALID_MESSAGE = "Описание фильма должно быть <= 200 символов.";
     private static final String FILM_NAME_INVALID_MESSAGE = "Название фильма не может быть пустым.";
 
-    public static boolean isValidated(Film film) {
+    public static void isValidated(Film film) {
         LocalDate filmHistoryStart = LocalDate.of(1895, 12, 28);
-        if (film.getName() == null || film.getName().isBlank()) {
+        if (Objects.isNull(film.getName()) || film.getName().isBlank()) {
             log.warn(VALIDATION_FILM_ERROR_BASIC_MESSAGE + FILM_NAME_INVALID_MESSAGE);
             throw new ValidationException(FILM_NAME_INVALID_MESSAGE);
         }
@@ -36,26 +37,24 @@ public class Validator {
             log.warn(VALIDATION_FILM_ERROR_BASIC_MESSAGE + INVALID_DURATION_MESSAGE);
             throw new ValidationException(INVALID_DURATION_MESSAGE);
         }
-        return true;
     }
 
-    public static boolean isValidated(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+    public static void isValidated(User user) {
+        if (Objects.isNull(user.getEmail()) || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn(VALIDATION_USER_ERROR_BASIC_MESSAGE + EMAIL_INVALID_MESSAGE);
             throw new ValidationException(EMAIL_INVALID_MESSAGE);
         }
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().chars().anyMatch(Character::isWhitespace)) {
+        if (Objects.isNull(user.getLogin()) || user.getLogin().isBlank() || user.getLogin().chars().anyMatch(Character::isWhitespace)) {
             log.warn(VALIDATION_USER_ERROR_BASIC_MESSAGE + LOGIN_INVALID_MESSAGE);
             throw new ValidationException(LOGIN_INVALID_MESSAGE);
         }
-        if (user.getName() == null || user.getName().isBlank()){
+        if (Objects.isNull(user.getName()) || user.getName().isBlank()){
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.warn(VALIDATION_USER_ERROR_BASIC_MESSAGE + BIRTHDAY_INVALID_MESSAGE);
             throw new ValidationException(BIRTHDAY_INVALID_MESSAGE);
         }
-        return true;
     }
 
 }

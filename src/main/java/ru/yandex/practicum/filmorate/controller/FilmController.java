@@ -22,14 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class FilmController {
 
-    protected static final AtomicInteger idProvider = new AtomicInteger(0);
+    private static final AtomicInteger ID_PROVIDER = new AtomicInteger(0);
     private final HashMap<Integer, Film> films = new HashMap<>();
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        int id = idProvider.incrementAndGet();
+        int id = ID_PROVIDER.incrementAndGet();
         Film filmCreated = film.withId(id);
         log.debug("Добавлен фильм: {}", filmCreated);
+
         films.put(id, filmCreated);
         return filmCreated;
     }

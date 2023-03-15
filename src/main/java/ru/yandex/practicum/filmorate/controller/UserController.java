@@ -21,12 +21,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class UserController {
 
-    protected static final AtomicInteger idProvider = new AtomicInteger(0);
+    private static final AtomicInteger ID_PROVIDER = new AtomicInteger(0);
     private final HashMap<Integer, User> users = new HashMap<>();
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        int id = idProvider.incrementAndGet();
+        int id = ID_PROVIDER.incrementAndGet();
         String name = getCorrectName(user);
         User userCreated = user.withId(id).withName(name);
         log.debug("Добавлен пользователь: {}", userCreated);

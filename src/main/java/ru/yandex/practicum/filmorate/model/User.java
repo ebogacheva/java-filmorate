@@ -11,6 +11,7 @@ import lombok.With;
 import ru.yandex.practicum.filmorate.model.annotations.UserLoginValidation;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -21,4 +22,5 @@ public class User {
     @NotNull @NotBlank @UserLoginValidation private String login;
     @With private String name;
     @PastOrPresent private LocalDate birthday;
+    private Set<Integer> friends;
 }

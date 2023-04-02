@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -22,7 +23,7 @@ public class UserService {
     public User create(User user) {
         String name = getCorrectName(user);
         User userWithCorrectName = user.withName(name);
-        return userStorage.put(userWithCorrectName);
+        return userStorage.create(userWithCorrectName);
     }
 
     public List<User> findAll() {
@@ -68,6 +69,11 @@ public class UserService {
         Collection<Integer> otherFriends = emptyIfNull(userStorage.getById(otherId).getFriends());
         List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         return getFriendsList(intersection);
+    }
+
+    public User getById(int userId) {
+        checkUsersExistenceById(userId);
+        return userStorage.getById(userId);
     }
 
     private List<User> getFriendsList(List<Integer> ids) {

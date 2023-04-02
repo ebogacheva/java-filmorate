@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,10 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -57,25 +55,20 @@ public class UserService {
     }
 
     public List<User> friends(int userId) {
+        checkUsersExistenceById(userId);
         Set<Integer> friendsId = userStorage.getById(userId).getFriends();
-        if (Objects.isNull(friendsId)) {
-            return null;
-        }
-        return getFriendsList(friendsId);
+        return getFriendsList(new ArrayList<>(emptyIfNull(friendsId)));
     }
 
     public List<User> commonFriends(int userId, int otherId) {
-        Set<Integer> userFriends = userStorage.getById(userId).getFriends();
-        Set<Integer> otherFriends = userStorage.getById(otherId).getFriends();
-        if (Objects.isNull(userFriends) || Objects.isNull(otherFriends)) {
-            return List.of();
-        }
-        //TODO: Нужна ли эта проверка или стрим отработает кейс?
-        Set<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toSet());
+        checkUsersExistenceById(userId, otherId);
+        Collection<Integer> userFriends = emptyIfNull(userStorage.getById(userId).getFriends());
+        Collection<Integer> otherFriends = emptyIfNull(userStorage.getById(otherId).getFriends());
+        List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         return getFriendsList(intersection);
     }
 
-    private List<User> getFriendsList(Set<Integer> ids) {
+    private List<User> getFriendsList(List<Integer> ids) {
         List<User> friends = new ArrayList<>();
         for(Integer id : ids) {
             friends.add(userStorage.getById(id));

@@ -32,35 +32,27 @@ public class UserService {
     }
 
     public User put(User user) {
-        if (notExist(user.getId())) {
-            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
-        }
+        checkUsersExistenceById(user.getId());
         String name = getCorrectName(user);
         User userUpdated = user.withName(name);
         return userStorage.put(userUpdated);
     }
 
     public void addFriend(int userId, int friendId) {
-        if (notExist(userId) && notExist(friendId)) {
-            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
-        }
+        checkUsersExistenceById(userId, friendId);
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-
         //TODO: Надо что-то возвращать в теле?
     }
 
     public void deleteFriend(int userId, int friendId) {
-        if (notExist(userId) && notExist(friendId)) {
-            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
-        }
+        checkUsersExistenceById(userId, friendId);
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
-
         //TODO: Надо что-то возвращать в теле?
     }
 
@@ -76,8 +68,9 @@ public class UserService {
         Set<Integer> userFriends = userStorage.getById(userId).getFriends();
         Set<Integer> otherFriends = userStorage.getById(otherId).getFriends();
         if (Objects.isNull(userFriends) || Objects.isNull(otherFriends)) {
-            return null;
+            return List.of();
         }
+        //TODO: Нужна ли эта проверка или стрим отработает кейс?
         Set<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toSet());
         return getFriendsList(intersection);
     }
@@ -90,8 +83,12 @@ public class UserService {
         return friends;
     }
 
-    private boolean notExist(int userId) {
-        return Objects.isNull(userStorage.getById(userId));
+    private void checkUsersExistenceById(int...userIds) {
+        for (int id : userIds) {
+            if (Objects.isNull(userStorage.getById(id))) {
+                throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
+            }
+        }
     }
 
     private String getCorrectName(User user) {

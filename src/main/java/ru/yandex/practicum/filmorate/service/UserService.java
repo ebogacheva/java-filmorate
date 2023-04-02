@@ -42,6 +42,7 @@ public class UserService {
         User friend = userStorage.getById(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
+        log.info("Теперь друзья: {} и {}", userId, friendId);
         //TODO: Надо что-то возвращать в теле?
     }
 
@@ -51,6 +52,7 @@ public class UserService {
         User friend = userStorage.getById(friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
+        log.info("Больше не друзья: {} и {}", userId, friendId);
         //TODO: Надо что-то возвращать в теле?
     }
 
@@ -76,7 +78,7 @@ public class UserService {
         return friends;
     }
 
-    private void checkUsersExistenceById(int...userIds) {
+    public void checkUsersExistenceById(int...userIds) {
         for (int id : userIds) {
             if (Objects.isNull(userStorage.getById(id))) {
                 throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);

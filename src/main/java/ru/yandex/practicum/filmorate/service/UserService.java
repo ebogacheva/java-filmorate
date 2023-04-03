@@ -79,7 +79,7 @@ public class UserService {
 
     private List<User> getFriendsList(List<Integer> ids) {
         List<User> friends = new ArrayList<>();
-        for(Integer id : ids) {
+        for (Integer id : ids) {
             friends.add(inMemoryUserStorage.getById(id));
         }
         return friends;

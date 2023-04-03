@@ -21,7 +21,8 @@ public class InMemoryFilmStorage implements FilmStorage{
         int id = ID_PROVIDER.incrementAndGet();
         Film filmCreated = film.withId(id);
         log.debug("Добавлен фильм: {}", filmCreated);
-        return films.put(id, filmCreated);
+        films.put(id, filmCreated);
+        return filmCreated;
     }
 
     @Override

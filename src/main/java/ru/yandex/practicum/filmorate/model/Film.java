@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -22,5 +23,5 @@ public class Film {
     @Size(max = 200, message = "Too long description.") private String description;
     @ReleaseDateValidation private LocalDate releaseDate;
     @Positive private long duration;
-    private Set<Integer> likes;
+    private final Set<Integer> likes = new HashSet<>();
 }

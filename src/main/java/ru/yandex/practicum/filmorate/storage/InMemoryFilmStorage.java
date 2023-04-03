@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
 
     private static final AtomicInteger ID_PROVIDER = new AtomicInteger(0);
     private final HashMap<Integer, Film> films = new HashMap<>();

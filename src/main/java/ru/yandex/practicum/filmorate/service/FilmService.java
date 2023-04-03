@@ -22,7 +22,7 @@ public class FilmService {
     @Autowired
     UserService userService;
 
-    public Film create (Film film) {
+    public Film create(Film film) {
         log.info("Добавлен фильм {}", film);
         return inMemoryFilmStorage.create(film);
     }

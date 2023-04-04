@@ -17,11 +17,16 @@ import java.util.Set;
 @Builder
 public class Film {
 
-    @With private int id;
+    @With private
+    int id;
     @NotNull(message = "Film name shouldn't be null.")
-    @NotBlank(message = "Film name shouldn't be empty.") private String name;
-    @Size(max = 200, message = "Too long description.") private String description;
-    @ReleaseDateValidation private LocalDate releaseDate;
-    @Positive private long duration;
+    @NotBlank(message = "Film name shouldn't be empty.")
+    private String name;
+    @Size(max = 200, message = "Too long description.")
+    private String description;
+    @ReleaseDateValidation
+    private LocalDate releaseDate;
+    @Positive
+    private long duration;
     private final Set<Integer> likes = new HashSet<>();
 }

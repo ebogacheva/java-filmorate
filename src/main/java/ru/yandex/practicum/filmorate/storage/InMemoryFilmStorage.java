@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private static final AtomicInteger ID_PROVIDER = new AtomicInteger(0);
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @Override
     public Film create(Film film) {

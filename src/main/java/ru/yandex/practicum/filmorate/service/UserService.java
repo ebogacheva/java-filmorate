@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    UserStorage inMemoryUserStorage;
+    private UserStorage inMemoryUserStorage;
 
     public User create(User user) {
         String name = getCorrectName(user);
@@ -78,11 +78,9 @@ public class UserService {
     }
 
     private List<User> getFriendsList(List<Integer> ids) {
-        List<User> friends = new ArrayList<>();
-        for (Integer id : ids) {
-            friends.add(inMemoryUserStorage.getById(id));
-        }
-        return friends;
+        return findAll().stream()
+                .filter(user -> ids.contains(user.getId()))
+                .collect(Collectors.toList());
     }
 
     public void checkUsersExistenceById(int...userIds) {

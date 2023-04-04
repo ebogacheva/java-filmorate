@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InMemoryUserStorage implements UserStorage {
 
     private static final AtomicInteger ID_PROVIDER = new AtomicInteger(0);
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @Override
     public User create(User user) {

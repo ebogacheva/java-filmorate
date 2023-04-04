@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     @Autowired
-    FilmStorage inMemoryFilmStorage;
+    private FilmStorage inMemoryFilmStorage;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     public Film create(Film film) {
         log.info("Добавлен фильм {}", film);

@@ -10,15 +10,23 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 public class Film {
 
-    @With private int id;
+    @With private
+    int id;
     @NotNull(message = "Film name shouldn't be null.")
-    @NotBlank(message = "Film name shouldn't be empty.") private String name;
-    @Size(max = 200, message = "Too long description.") private String description;
-    @ReleaseDateValidation private LocalDate releaseDate;
-    @Positive private long duration;
+    @NotBlank(message = "Film name shouldn't be empty.")
+    private String name;
+    @Size(max = 200, message = "Too long description.")
+    private String description;
+    @ReleaseDateValidation
+    private LocalDate releaseDate;
+    @Positive
+    private long duration;
+    private final Set<Integer> likes = new HashSet<>();
 }

@@ -34,7 +34,7 @@ public class UserService {
         String name = getCorrectName(user);
         User userUpdated = user.withName(name);
         log.info("Обновлен пользователь: {}", userUpdated.getId());
-        return inMemoryUserStorage.put(userUpdated);
+        return inMemoryUserStorage.update(userUpdated);
     }
 
     public void addFriend(int userId, int friendId) {

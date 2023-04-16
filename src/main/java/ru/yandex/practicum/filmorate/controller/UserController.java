@@ -28,7 +28,7 @@ public class UserController {
 
     @PutMapping
     public User put(@Valid @RequestBody User user) {
-        return userService.put(user);
+        return userService.update(user);
     }
 
     @GetMapping(value = "/{id}")
@@ -39,7 +39,7 @@ public class UserController {
     @PutMapping(value = "/{id}/friends/{friendId}")
     public void addFriend(@PathVariable int id,
                           @PathVariable int friendId) {
-        userService.addFriend(id, friendId);
+        userService.sendFriendRequest(id, friendId);
     }
 
     @DeleteMapping(value = "/{id}/friends/{friendId}")

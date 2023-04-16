@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.util.*;
@@ -17,55 +18,51 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    private UserStorage inMemoryUserStorage;
+    private UserStorage userDbStorage;
+
+    @Autowired
+    FriendshipStorage friendshipDbStorage;
 
     public User create(User user) {
         String name = getCorrectName(user);
         User userWithCorrectName = user.withName(name);
-        return inMemoryUserStorage.create(userWithCorrectName);
+        return userDbStorage.create(userWithCorrectName);
     }
 
     public List<User> findAll() {
-        return inMemoryUserStorage.findAll();
+        return userDbStorage.findAll();
     }
 
-    public User put(User user) {
+    public User update(User user) {
         checkUsersExistenceById(user.getId());
         String name = getCorrectName(user);
         User userUpdated = user.withName(name);
         log.info("Обновлен пользователь: {}", userUpdated.getId());
-        return inMemoryUserStorage.update(userUpdated);
+        return userDbStorage.update(userUpdated);
     }
 
-    public void addFriend(int userId, int friendId) {
+    public void sendFriendRequest(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
-        User user = inMemoryUserStorage.getById(userId);
-        User friend = inMemoryUserStorage.getById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        log.info("Теперь друзья: {} и {}", userId, friendId);
+        friendshipDbStorage.sendFriendRequest(userId, friendId);
+        log.info("Пользователь {} отправил запрос в друзья пользователю {}", userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
-        User user = inMemoryUserStorage.getById(userId);
-        User friend = inMemoryUserStorage.getById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        log.info("Больше не друзья: {} и {}", userId, friendId);
+        friendshipDbStorage.deleteFriend(userId, friendId);
+        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId); //TODO: what with users' requests?
     }
 
     public List<User> friends(int userId) {
         checkUsersExistenceById(userId);
-        Set<Integer> friendsId = inMemoryUserStorage.getById(userId).getFriends();
-        log.info("У пользователя {} - {} друзей.", userId, friendsId.size());
+        Set<Integer> friendsId = new HashSet<>(userDbStorage.getUserFriends(userId));
         return getFriendsList(new ArrayList<>(emptyIfNull(friendsId)));
     }
 
     public List<User> commonFriends(int userId, int otherId) {
         checkUsersExistenceById(userId, otherId);
-        Collection<Integer> userFriends = emptyIfNull(inMemoryUserStorage.getById(userId).getFriends());
-        Collection<Integer> otherFriends = emptyIfNull(inMemoryUserStorage.getById(otherId).getFriends());
+        Collection<Integer> userFriends = emptyIfNull(userDbStorage.getUserFriends(userId));
+        Collection<Integer> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
         List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         log.info("Общие друзья {} и {}: {}.", userId, otherId, intersection);
         return getFriendsList(intersection);
@@ -74,7 +71,7 @@ public class UserService {
     public User getById(int userId) {
         checkUsersExistenceById(userId);
         log.info("Найден пользователь: {}", userId);
-        return inMemoryUserStorage.getById(userId);
+        return userDbStorage.getById(userId);
     }
 
     private List<User> getFriendsList(List<Integer> ids) {
@@ -85,7 +82,7 @@ public class UserService {
 
     public void checkUsersExistenceById(int...userIds) {
         for (int id : userIds) {
-            if (Objects.isNull(inMemoryUserStorage.getById(id))) {
+            if (Objects.isNull(userDbStorage.getById(id))) {
                 log.info("Пользователь не найден: {}", id);
                 throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
             }

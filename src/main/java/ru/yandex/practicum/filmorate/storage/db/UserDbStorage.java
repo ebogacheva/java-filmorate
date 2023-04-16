@@ -1,51 +1,42 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
-import org.springframework.dao.DataAccessException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
 @Component("UserDbStorage")
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-    //TODO: refactor
-    private final String SQL_QUERY_GET_USER_BY_ID = "SELECT * FROM users_filmorate WHERE user_id = ?";
-    private final String SQL_QUERY_GET_ALL_USERS = "SELECT * FROM users_filmorate";
-    private final String SQL_QUERY_UPDATE = "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
-            "WHERE user_id = ?";
-    private final String SQL_QUERY_DELETE_FRIENDS = "DELETE FROM friendship WHERE user1_id = ?";
-    private final String SQL_QUERY_INSERT_FRIENDS = "INSERT INTO friendship (user1_id, user2_id, approved) values (?, ?, 'TRUE')";
-    private final String SQL_QUERY_DELETE_USER_BY_ID = "DELETE FROM users_filmorate WHERE id = ?";
 
-    private final String SQL_QUERY_GET_CONFIRMED_FRIENDS = "SELECT * FROM users_filmorate WHERE user_id IN " +
+    private static final String SQL_QUERY_GET_USER_BY_ID = "SELECT (id, email, login, name, birthday) FROM users_filmorate WHERE id = ?";
+    private static final String SQL_QUERY_GET_ALL_USERS = "SELECT (id, email, login, name, birthday) FROM users_filmorate";
+    private static final String SQL_QUERY_UPDATE_USER = "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
+            "WHERE id = ?";
+    private static final String SQL_QUERY_DELETE_USER_BY_ID = "DELETE FROM users_filmorate WHERE id = ?";
+
+    private static final String SQL_QUERY_GET_CONFIRMED_FRIENDS = "SELECT id FROM users_filmorate WHERE id IN " +
             "(SELECT f1.user2_id FROM friendship AS f1 JOIN friendship AS f2 " +
             "ON f1.user1_id = ? AND f1.user2_id = f2.user1_id)";
 
-    private final String SQL_QUERY_GET_FRIENDS_REQUESTS = "SELECT * FROM users_filmorate WHERE user_id IN " +
+    private static final String SQL_QUERY_GET_FRIENDS_REQUESTS = "SELECTid FROM users_filmorate WHERE id IN " +
             "(SELECT user1_id FROM friendship WHERE user2_id = ?) AND NOT IN" +
             "(SELECT f1.user1_id FROM friendship AS f1 JOIN friendship AS f2 " +
             "ON f1.user2_id = f2.user1_id AND f1.user1_id = ?";
 
-
     private final JdbcTemplate jdbcTemplate;
-
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public User create(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("USERS_FILMORATE")
-                .usingGeneratedKeyColumns("USER_ID");
+                .usingGeneratedKeyColumns("ID");
         user.setId(simpleJdbcInsert.executeAndReturnKey(user.toMap()).intValue());
         return user;
     }
@@ -62,7 +53,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        jdbcTemplate.update(SQL_QUERY_UPDATE,
+        jdbcTemplate.update(SQL_QUERY_UPDATE_USER,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -88,7 +79,7 @@ public class UserDbStorage implements UserStorage {
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
-                .id(resultSet.getInt("USER_ID"))
+                .id(resultSet.getInt("ID"))
                 .email(resultSet.getString("EMAIL"))
                 .login(resultSet.getString("LOGIN"))
                 .name(resultSet.getString("NAME"))
@@ -97,6 +88,6 @@ public class UserDbStorage implements UserStorage {
     }
 
     private int getIdFromRow(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("USER_ID");
+        return resultSet.getInt("ID");
     }
 }

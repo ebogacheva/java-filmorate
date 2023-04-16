@@ -8,7 +8,6 @@ public interface FilmStorage {
     Film getById(int id);
     List<Film> findAll();
     Film update(Film film);
-
-    boolean delete(Film film);
+    boolean delete(int id);
 
 }

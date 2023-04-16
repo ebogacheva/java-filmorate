@@ -33,6 +33,18 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNoSuchFilm(final NoSuchGenreException e) {
+        return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNoSuchMpa(final NoSuchMpaException e) {
+        return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationFailed(final ValidationException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());

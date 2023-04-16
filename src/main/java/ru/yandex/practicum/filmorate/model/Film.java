@@ -12,9 +12,10 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Film {
 
     @With private
@@ -28,13 +29,6 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private long duration;
-
-    public Map<String, Object> toMap() { //TODO: refactor
-        Map<String, Object> values = new HashMap<>();
-        values.put("NAME", this.getName());
-        values.put("DESCRIPTION", this.getDescription());
-        values.put("RELEASE_DATE",this.getReleaseDate());
-        values.put("DURATION", this.getDuration());
-        return values;
-    }
+    private Set<Genre> genres;
+    private Mpa mpa;
 }

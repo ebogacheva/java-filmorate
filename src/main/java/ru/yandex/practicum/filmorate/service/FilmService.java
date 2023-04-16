@@ -2,14 +2,16 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchFilmException;
+import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,62 +19,90 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     @Autowired
-    private FilmStorage inMemoryFilmStorage;
+    private FilmStorage filmDbStorage;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private GenreService genreService;
+
+    @Autowired
+    private MpaService mpaService;
+
+    @Autowired
+    private LikeService likeService;
+
     public Film create(Film film) {
         log.info("Добавлен фильм {}", film);
-        return inMemoryFilmStorage.create(film);
+        return filmDbStorage.create(film);
+    }
+
+    public Film getById(int filmId) {
+        Film film;
+        try {
+            film = filmDbStorage.getById(filmId);
+        } catch (DataAccessException ex) {
+            log.info("Фильма не найден: {}", filmId);
+            throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
+        }
+        return film;
     }
 
     public List<Film> findAll() {
-        return inMemoryFilmStorage.findAll();
+        return filmDbStorage.findAll();
     }
 
-    public Film put(Film film) {
-        if (Objects.isNull(inMemoryFilmStorage.getById(film.getId()))) {
-            throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
-        }
+    public List<User> getAllFilmLikes(int filmId) {
+        checkFilmsExistenceById(filmId);
+        List<Integer> likes = likeService.getAllFilmLikes(filmId);
+        return userService.getUsersList(likes);
+    }
+
+    public Film update(Film film) {
+        checkFilmsExistenceById(film.getId());
         log.info("Обновлена информация о фильме {}", film);
-        return inMemoryFilmStorage.update(film);
+        return filmDbStorage.update(film);
     }
 
-    public Film like(int id, int userId) {
-        checkFilmsExistenceById(id);
-        userService.checkUsersExistenceById(userId);
-        inMemoryFilmStorage.getById(id).getLikes().add(userId);
-        log.info("Фильм {} нравится {} пользователям", id, userId);
-        return inMemoryFilmStorage.getById(id);
+    public void delete(int filmId) {
+        try {
+            if (filmDbStorage.delete(filmId)) {
+                log.info("Удален фильм: {}", filmId);
+            }
+        } catch (DataAccessException ex) {
+            log.info("Фильм не найден: {}", filmId);
+            throw new NoSuchUserException(Constants.FILM_NOT_FOUND_INFO);
+        }
     }
 
-    public Film dislike(int id, int userId) {
-        checkFilmsExistenceById(id);
+    public Film like(int filmId, int userId) {
+        checkFilmsExistenceById(filmId);
         userService.checkUsersExistenceById(userId);
-        inMemoryFilmStorage.getById(id).getLikes().remove(userId);
-        log.info("Фильм {} больше не нравится пользователю {}", id, userId);
-        return inMemoryFilmStorage.getById(id);
+        likeService.likeFilm(filmId, userId);
+        return getById(filmId);
+    }
+
+    public Film dislike(int filmId, int userId) {
+        checkFilmsExistenceById(filmId);
+        userService.checkUsersExistenceById(userId);
+        likeService.dislikeFilm(filmId, userId);
+        return getById(filmId);
     }
 
     public List<Film> popular(int count) {
-        return inMemoryFilmStorage.findAll()
+        return filmDbStorage.findAll()
                 .stream()
-                .sorted((film, film2) -> -(film.getLikes().size() - film2.getLikes().size()))
+                .sorted((film, film2) ->
+                        -(likeService.getAllFilmLikes(film.getId()).size()
+                                - likeService.getAllFilmLikes(film2.getId()).size()))
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    public Film getById(int filmId) {
-        checkFilmsExistenceById(filmId);
-        return inMemoryFilmStorage.getById(filmId);
-    }
-
-    private void checkFilmsExistenceById(int...filmIds) {
+    public void checkFilmsExistenceById(int...filmIds) {
         for (int id : filmIds) {
-            if (Objects.isNull(inMemoryFilmStorage.getById(id))) {
-                throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
-            }
+            getById(id);
         }
     }
 }

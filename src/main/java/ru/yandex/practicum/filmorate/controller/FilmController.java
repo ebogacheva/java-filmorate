@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -34,13 +35,23 @@ public class FilmController {
 
     @PutMapping
     public Film put(@Valid @RequestBody Film film) {
-        return filmService.put(film);
+        return filmService.update(film);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public void delete(@PathVariable int id) {
+        filmService.delete(id);
+    }
+
+    @GetMapping(value = "{id}/like")
+    public List<User> getAllFilmLikes(@PathVariable int id) {
+        return filmService.getAllFilmLikes(id);
     }
 
     @PutMapping(value = "{id}/like/{userId}")
     public Film put(@PathVariable int id,
                     @PathVariable int userId) {
-        return filmService.like(id, userId);
+       return filmService.like(id, userId);
     }
 
     @DeleteMapping(value = "/{id}/like/{userId}")

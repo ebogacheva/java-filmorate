@@ -60,13 +60,13 @@ public class UserController {
 
     @GetMapping(value = "/{id}/requests")
     public List<User> requests(@PathVariable int id) {
-        return userService.getFriendRequests(id);
+        return userService.getFriendsRequests(id);
     }
 
     @PutMapping(value = "/{id}/requests/{otherId}/confirm")
     public void confirmRequest(@PathVariable int id,
                                @PathVariable int otherId) {
-
+        userService.confirmFriendRequest(id, otherId);
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")

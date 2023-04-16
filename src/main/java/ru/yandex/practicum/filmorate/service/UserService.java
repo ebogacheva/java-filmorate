@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public User getById(int userId) {
-        User user = null;
+        User user;
         try {
             user = userDbStorage.getById(userId);
         } catch (DataAccessException ex) {
@@ -85,13 +85,13 @@ public class UserService {
     public List<User> friends(int userId) {
         checkUsersExistenceById(userId);
         Set<Integer> friendsId = new HashSet<>(userDbStorage.getUserFriends(userId));
-        return getFriendsList(new ArrayList<>(emptyIfNull(friendsId)));
+        return getUsersList(new ArrayList<>(emptyIfNull(friendsId)));
     }
 
-    public List<User> getFriendRequests(int userId) {
+    public List<User> getFriendsRequests(int userId) {
         checkUsersExistenceById(userId);
         Set<Integer> requests = new HashSet<>(userDbStorage.getFriendRequests(userId));
-        return getFriendsList(new ArrayList<>(emptyIfNull(requests)));
+        return getUsersList(new ArrayList<>(emptyIfNull(requests)));
     }
 
     public void confirmFriendRequest (int userId, int otherId) {
@@ -105,10 +105,10 @@ public class UserService {
         Collection<Integer> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
         List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         log.info("Общие друзья {} и {}: {}.", userId, otherId, intersection);
-        return getFriendsList(intersection);
+        return getUsersList(intersection);
     }
 
-    private List<User> getFriendsList(List<Integer> ids) {
+    public List<User> getUsersList(List<Integer> ids) {
         return findAll().stream()
                 .filter(user -> ids.contains(user.getId()))
                 .collect(Collectors.toList());

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NoSuchFriendRequestException;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class FriendshipDbStorage implements FriendshipStorage{
         List<Integer> requests = userDbStorage.getFriendRequests(userId);
         if (requests.contains(friendId)) {
             jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
+        } else {
+            throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND);
         }
     }
 }

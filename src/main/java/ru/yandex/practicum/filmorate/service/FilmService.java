@@ -36,7 +36,7 @@ public class FilmService {
             throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
         }
         log.info("Обновлена информация о фильме {}", film);
-        return inMemoryFilmStorage.put(film);
+        return inMemoryFilmStorage.update(film);
     }
 
     public Film like(int id, int userId) {

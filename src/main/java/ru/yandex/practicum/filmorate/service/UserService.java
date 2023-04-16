@@ -59,6 +59,17 @@ public class UserService {
         return userDbStorage.update(userUpdated);
     }
 
+    public void delete(int id) {
+        try {
+            if (userDbStorage.delete(id)) {
+                log.info("Удален пользователь: {}", id);
+            }
+        } catch (DataAccessException ex) { // TODO: not sure
+            log.info("Пользователь не найден: {}", id);
+            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
+        }
+    }
+
     public void sendFriendRequest(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
         friendshipDbStorage.sendFriendRequest(userId, friendId);
@@ -75,6 +86,17 @@ public class UserService {
         checkUsersExistenceById(userId);
         Set<Integer> friendsId = new HashSet<>(userDbStorage.getUserFriends(userId));
         return getFriendsList(new ArrayList<>(emptyIfNull(friendsId)));
+    }
+
+    public List<User> getFriendRequests(int userId) {
+        checkUsersExistenceById(userId);
+        Set<Integer> requests = new HashSet<>(userDbStorage.getFriendRequests(userId));
+        return getFriendsList(new ArrayList<>(emptyIfNull(requests)));
+    }
+
+    public void confirmFriendRequest (int userId, int otherId) {
+        checkUsersExistenceById(userId, otherId);
+        friendshipDbStorage.confirmRequest(userId, otherId);
     }
 
     public List<User> commonFriends(int userId, int otherId) {

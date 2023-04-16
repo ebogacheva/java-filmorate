@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface FilmStorage {
     Film create(Film film);
-
-    List<Film> findAll();
-
-    Film put(Film film);
-
     Film getById(int id);
+    List<Film> findAll();
+    Film update(Film film);
+
+    boolean delete(Film film);
+
 }

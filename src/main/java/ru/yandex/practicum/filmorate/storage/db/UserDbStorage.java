@@ -1,21 +1,22 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.utils.Constants;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
 @Component("UserDbStorage")
 public class UserDbStorage implements UserStorage {
-
+    //TODO: refactor
     private final String SQL_QUERY_GET_USER_BY_ID = "SELECT * FROM users_filmorate WHERE user_id = ?";
     private final String SQL_QUERY_GET_ALL_USERS = "SELECT * FROM users_filmorate";
     private final String SQL_QUERY_UPDATE = "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
@@ -50,8 +51,24 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public User getById(int id) {
+        return jdbcTemplate.queryForObject(SQL_QUERY_GET_USER_BY_ID, this::mapRowToUser, id);
+    }
+
+    @Override
     public List<User> findAll() {
         return jdbcTemplate.query(SQL_QUERY_GET_ALL_USERS, this::mapRowToUser);
+    }
+
+    @Override
+    public User update(User user) {
+        jdbcTemplate.update(SQL_QUERY_UPDATE,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId());
+        return user;
     }
 
     @Override
@@ -64,39 +81,9 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(SQL_QUERY_GET_CONFIRMED_FRIENDS,this::getIdFromRow, id);
     }
 
-    @Override //TODO: move to Service
-    public List<Integer> getCommonFriends(int id1, int id2) {
-        return null;
-    }
-
     @Override
     public List<Integer> getFriendRequests(int id) {
         return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, this::getIdFromRow, id);
-    }
-
-    @Override
-    public User update(User user) {
-        jdbcTemplate.update(SQL_QUERY_UPDATE,
-                            user.getEmail(),
-                            user.getLogin(),
-                            user.getName(),
-                            user.getBirthday(),
-                            user.getId());
-        return user;
-    }
-
-    @Override
-    public User getById(int id) {
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(SQL_QUERY_GET_USER_BY_ID, id);
-
-        if (rs.next()) {
-            return new User(rs.getInt("USER_ID"),
-                    rs.getString("EMAIL"),
-                    rs.getString("LOGIN"),
-                    rs.getString("NAME"),
-                    Objects.requireNonNull(rs.getDate("BIRTHDAY")).toLocalDate());
-        }
-        return null;
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

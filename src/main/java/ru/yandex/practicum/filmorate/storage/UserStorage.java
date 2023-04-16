@@ -16,7 +16,5 @@ public interface UserStorage {
 
     List<Integer> getUserFriends(int id);
 
-    List<Integer> getCommonFriends(int id1, int id2);
-
     List<Integer> getFriendRequests(int id);
 }

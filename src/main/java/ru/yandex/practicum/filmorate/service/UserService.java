@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -29,8 +30,25 @@ public class UserService {
         return userDbStorage.create(userWithCorrectName);
     }
 
+    public User getById(int userId) {
+        User user = null;
+        try {
+            user = userDbStorage.getById(userId);
+        } catch (DataAccessException ex) {
+            log.info("Пользователь не найден: {}", userId);
+            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
+        }
+        return user;
+    }
+
     public List<User> findAll() {
-        return userDbStorage.findAll();
+        List<User> users = new ArrayList<>();
+        // TODO: DO we need it here?
+        try {
+            userDbStorage.findAll();
+        } catch (DataAccessException ignored) {
+        }
+        return users;
     }
 
     public User update(User user) {
@@ -68,12 +86,6 @@ public class UserService {
         return getFriendsList(intersection);
     }
 
-    public User getById(int userId) {
-        checkUsersExistenceById(userId);
-        log.info("Найден пользователь: {}", userId);
-        return userDbStorage.getById(userId);
-    }
-
     private List<User> getFriendsList(List<Integer> ids) {
         return findAll().stream()
                 .filter(user -> ids.contains(user.getId()))
@@ -82,10 +94,7 @@ public class UserService {
 
     public void checkUsersExistenceById(int...userIds) {
         for (int id : userIds) {
-            if (Objects.isNull(userDbStorage.getById(id))) {
-                log.info("Пользователь не найден: {}", id);
-                throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
-            }
+            getById(id);
         }
     }
 

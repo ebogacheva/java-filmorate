@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
@@ -14,9 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LikeDbStorage implements LikeStorage{
 
-    private static final String SQL_QUERY_LIKE_FILM = "INSERT INTO like (film_id, user_id) VALUES (?, ?)";
-    private static final String SQL_QUERY_DISLIKE_FILM = "DELETE FROM like WHERE film_id = ? AND user_id = ?";
-    private static final String SQL_QUERY_GET_ALL_FILM_LIKES = "SELECT user_id FROM like WHERE film_id = ?";
+    private static final String SQL_QUERY_LIKE_FILM = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+    private static final String SQL_QUERY_DISLIKE_FILM = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
+    private static final String SQL_QUERY_GET_ALL_FILM_LIKES = "SELECT user_id FROM likes WHERE film_id = ?";
+
     private static final String USER_LIKE_FILM_INFO = "Пользователю {} нравится фильм {}";
     private static final String USER_DISLIKE_FILM_INFO = "Пользователю {} больше не нравится фильм {}";
 
@@ -36,12 +36,6 @@ public class LikeDbStorage implements LikeStorage{
 
     @Override
     public List<Integer> getAllFilmLikes(int filmId) {
-        return jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_LIKES, this::getIdFromRow);
+        return jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_LIKES, FilmorateRowMappers::getUserId, filmId);
     }
-
-    private int getIdFromRow(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("FILM_ID");
-    }
-
-
 }

@@ -2,15 +2,12 @@ package ru.yandex.practicum.filmorate.storage.db.genre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -26,24 +23,15 @@ public class GenreDbStorage implements GenreStorage{
 
     @Override
     public Genre getGenreById(int genreId) {
-        Genre genre = null;
-        try {
-            genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID , GenreDbStorage::mapRowToGenre, genreId);
-            log.info(GOT_GENRE_BY_ID_INFO, genreId);
-        } catch (DataAccessException ignored) {
-        }
+        Genre genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID , FilmorateRowMappers::getGenre, genreId);
+        log.info(GOT_GENRE_BY_ID_INFO, genreId);
         return genre;
     }
 
     @Override
-    public Set<Genre> getAllGenres() {
-        return new HashSet<>(jdbcTemplate.query(SQL_QUERY_GET_ALL_GENRES, GenreDbStorage::mapRowToGenre));
+    public List<Genre> getAllGenres() {
+        return new ArrayList<>(jdbcTemplate.query(SQL_QUERY_GET_ALL_GENRES, FilmorateRowMappers::getGenre));
     }
 
-    public static Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return Genre.builder()
-                .id(resultSet.getInt("GENRE_ID"))
-                .name(resultSet.getString("NAME"))
-                .build();
-    }
+
 }

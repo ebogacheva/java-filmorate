@@ -6,20 +6,21 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.db.genre.GenreDbStorage;
-import java.util.HashSet;
-import java.util.Set;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
+
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FilmGenreDbStorage implements FilmGenreStorage{
 
-    final static String SQL_QUERY_ADD_GENRE_FOR_FILM = "INSERT INTO film_genre (film_id, genre_id) values(?, ?)";
-    final static String SQL_QUERY_GET_ALL_FILM_GENRES = "SELECT (g.id, d.name) FROM genre AS g RIGHT JOIN film_genre AS fm" +
-            "ON g.id = fm.genre_id WHERE fm.film_id = ?";
-    final static String NEW_GENRE_FOR_FILM_INFO = "Добавлен новый жанр {} к фильму {}.";
-    final static String GOT_ALL_GENRES_FOR_FILM_INFO = "Из базы получены все жанры фильма {}.";
+    private final static String SQL_QUERY_ADD_GENRE_FOR_FILM = "INSERT INTO film_genre (film_id, genre_id) values(?, ?)";
+    private final static String SQL_QUERY_DELETE_FILM_GENRES = "DELETE FROM film_genre WHERE film_id = ?";
+    private final static String SQL_QUERY_GET_ALL_FILM_GENRES = "SELECT g.id, g.name FROM genre AS g LEFT JOIN film_genre AS fg " +
+            "ON g.id = fg.genre_id WHERE fg.film_id = ?";
+    private final static String NEW_GENRE_FOR_FILM_INFO = "Добавлен новый жанр {} к фильму {}.";
+    private final static String GOT_ALL_GENRES_FOR_FILM_INFO = "Из базы получены все жанры фильма {}.";
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -29,14 +30,19 @@ public class FilmGenreDbStorage implements FilmGenreStorage{
     }
 
     @Override
-    public Set<Genre> getAllFilmGenresById(int filmId) {
-        Set<Genre> genres;
+    public void deleteFilmGenre(int filmId) {
+        jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRES, filmId);
+    }
+
+    @Override
+    public List<Genre> getAllFilmGenresById(int filmId) {
+        List<Genre> genres;
         try {
-            genres = new HashSet<>(jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_GENRES, GenreDbStorage::mapRowToGenre, filmId));
+            genres = jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_GENRES, FilmorateRowMappers::getGenre, filmId);
             log.info(GOT_ALL_GENRES_FOR_FILM_INFO, filmId);
             return genres;
         } catch (DataAccessException ignored) {
-            return Set.of();
+            return List.of();
         }
     }
 }

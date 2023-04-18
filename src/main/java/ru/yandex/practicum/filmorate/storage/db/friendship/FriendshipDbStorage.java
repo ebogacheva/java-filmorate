@@ -16,8 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FriendshipDbStorage implements FriendshipStorage{
 
-    private static final String SQL_QUERY_SEND_FRIEND_REQUEST = "INSERT INTO friendships (user_id, friend_id) VALUES (?, ?)";
-    private static final String SQL_QUERY_DELETE_FRIEND = "DELETE FROM friendships WHERE user_id = ? and friend_id = ?";
+    private static final String SQL_QUERY_SEND_FRIEND_REQUEST = "INSERT INTO friendship (user1_id, user2_id) VALUES (?, ?)";
+    private static final String SQL_QUERY_DELETE_FRIEND = "DELETE FROM friendship WHERE user1_id = ? and user2_id = ?";
     private static final String SENT_FRIEND_REQUEST_INFO = "Пользователь {} отправил запрос на дружбу пользователю {}.";
     private static final String DELETE_FROM_FRIENDS_INFO = "Пользователь {} больше не дружит с пользователем {}.";
     private static final String CONFIRM_REQUEST_INFO = "Пользователь {} подтвердил дружбу с пользователем {}.";
@@ -45,7 +45,7 @@ public class FriendshipDbStorage implements FriendshipStorage{
             jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
             log.info(CONFIRM_REQUEST_INFO, userId, friendId);
         } else {
-            throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND);
+            throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 }

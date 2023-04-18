@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -9,37 +8,45 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.db.filmGenre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.db.filmMpa.FilmMpaStorage;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Component("FilmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
-    private static final String SQL_QUERY_CREATE_FILM = "INSERT INTO film (name, release_date, description, duration) " +
+    private static final String SQL_QUERY_CREATE_FILM = "INSERT INTO film (name, description, release_date, duration) " +
             "VALUES (?, ?, ?, ?)";
-    private static final String SQL_QUERY_GET_FILM_BY_ID = "SELECT (id, name, description, release_date, duration) " +
+    private static final String SQL_QUERY_GET_FILM_BY_ID = "SELECT id, name, description, release_date, duration " +
             "FROM film WHERE id = ?";
-    private static final String SQL_QUERY_GET_ALL_FILMS = "SELECT (id, name, description, release_date, duration) " +
+    private static final String SQL_QUERY_GET_ALL_FILMS = "SELECT id, name, description, release_date, duration " +
             "FROM film";
     private static final String SQL_QUERY_UPDATE_FILM = "UPDATE film SET name = ?, description = ?, release_date = ?, duration = ? " +
             "WHERE id = ?";
     private static final String SQL_QUERY_DELETE_FILM_BY_ID = "DELETE FROM film WHERE id = ?";
 
+    private static final String SQL_QUERY_GET_ALL_FILM_LIKES = "SELECT id, email, login, name, birthday " +
+            "FROM likes AS l LEFT JOIN users_filmorate AS fm ON l.user_id = fm.id WHERE l.film_id = ?";
+
     private final JdbcTemplate jdbcTemplate;
     private final FilmGenreStorage filmGenreDbStorage;
     private final FilmMpaStorage filmMpaDbStorage;
+    private final GenreService genreService;
+
 
     @Override
     public Film create(Film film) {
+
         KeyHolder generatedKeyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_QUERY_CREATE_FILM, new String[]{"id"});
@@ -51,15 +58,16 @@ public class FilmDbStorage implements FilmStorage {
         }, generatedKeyHolder);
 
         int filmId = Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
-        film.setId(filmId);
-        completeDbWithFilmMpaAndGenres(film);
-        return film;
+        Film created = film.withId(filmId);
+        completeDbWithFilmMpaAndGenres(created);
+        completeFilmWithMpaAndGenresFromDb(created);
+        return created;
     }
 
     @Override
     public Film getById(int id) {
         // TODO: catch exception in service
-        Film film = jdbcTemplate.queryForObject(SQL_QUERY_GET_FILM_BY_ID, this::mapRowToFilm, id);
+        Film film = jdbcTemplate.queryForObject(SQL_QUERY_GET_FILM_BY_ID, FilmorateRowMappers::getFilm, id);
         if (Objects.nonNull(film)) {
             completeFilmWithMpaAndGenresFromDb(film);
         }
@@ -68,7 +76,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-        return jdbcTemplate.query( SQL_QUERY_GET_ALL_FILMS, this::mapRowToFilm);
+        List<Film> films = jdbcTemplate.query(SQL_QUERY_GET_ALL_FILMS, FilmorateRowMappers::getFilm);
+        films.forEach(this::completeFilmWithMpaAndGenresFromDb);
+        return films;
     }
 
     @Override
@@ -79,7 +89,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(),
                 film.getDuration(),
                 film.getId());
-        completeFilmWithMpaAndGenresFromDb(film);
+        completeDbWithFilmMpaAndGenres(film);
         return film;
     }
 
@@ -88,18 +98,35 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(SQL_QUERY_DELETE_FILM_BY_ID, id) > 0;
     }
 
+    public List<User> getAllFilmLikes(int filmId) {
+        return jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_LIKES, FilmorateRowMappers::getUser);
+    }
+
     private void completeDbWithFilmMpaAndGenres(Film film) {
-        int mpaId = film.getMpa().getId();
         int filmId = film.getId();
-        filmMpaDbStorage.addFilmMpa(filmId, mpaId);
-        film.getGenres().forEach(genre -> filmGenreDbStorage.addFilmGenre(filmId, genre.getId()));
+        clearDbFilmMpaAndGenre(filmId);
+
+        if (Objects.nonNull(film.getMpa())){
+            int mpaId = film.getMpa().getId();
+            filmMpaDbStorage.addFilmMpa(filmId, mpaId);
+        }
+        if (Objects.nonNull(film.getGenres())) {
+            Set<Genre> genres = film.getGenres();
+            genres.forEach(genre -> genreService.addFilmGenre(filmId, genre.getId()));
+        }
     }
 
     private void completeFilmWithMpaAndGenresFromDb(Film film) {
         int filmId = film.getId();
         Mpa mpa = filmMpaDbStorage.getFilmMpaById(filmId);
-        Set<Genre> genres = filmGenreDbStorage.getAllFilmGenresById(filmId);
-        film.toBuilder().mpa(mpa).genres(genres).build();
+        Set<Genre> genres = new TreeSet<>(filmGenreDbStorage.getAllFilmGenresById(filmId));
+        film.setMpa(mpa);
+        film.setGenres(genres);
+    }
+
+    private void clearDbFilmMpaAndGenre(int filmId) {
+        filmMpaDbStorage.deleteFilmMap(filmId);
+        filmGenreDbStorage.deleteFilmGenre(filmId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

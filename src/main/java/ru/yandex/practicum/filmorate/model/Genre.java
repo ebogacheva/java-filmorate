@@ -1,16 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class Genre {
+@EqualsAndHashCode(exclude = "name")
+public class Genre implements Comparable<Genre>{
 
     private int id;
     private String name;
+
+    @Override
+    public int compareTo(Genre genre) {
+        return Integer.compare(this.id, genre.id);
+    }
 }

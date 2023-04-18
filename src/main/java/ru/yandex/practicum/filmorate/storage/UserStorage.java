@@ -13,7 +13,7 @@ public interface UserStorage {
 
     boolean delete(int id);
 
-    List<Integer> getUserFriends(int id);
+    List<User> getUserFriends(int id);
 
     List<Integer> getFriendRequests(int id);
 }

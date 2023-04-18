@@ -14,8 +14,6 @@ import java.util.Map;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
     @With
@@ -33,7 +31,7 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    public Map<String, Object> toMap() { //TODO: refactor
+    public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("EMAIL", this.getEmail());
         values.put("LOGIN", this.getLogin());

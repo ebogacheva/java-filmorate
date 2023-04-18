@@ -6,29 +6,29 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 @Component("UserDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
-    private static final String SQL_QUERY_GET_USER_BY_ID = "SELECT (id, email, login, name, birthday) FROM users_filmorate WHERE id = ?";
-    private static final String SQL_QUERY_GET_ALL_USERS = "SELECT (id, email, login, name, birthday) FROM users_filmorate";
+    private static final String SQL_QUERY_GET_USER_BY_ID = "SELECT * FROM users_filmorate WHERE id = ?";
+    private static final String SQL_QUERY_GET_ALL_USERS = "SELECT * FROM users_filmorate";
     private static final String SQL_QUERY_UPDATE_USER = "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
             "WHERE id = ?";
     private static final String SQL_QUERY_DELETE_USER_BY_ID = "DELETE FROM users_filmorate WHERE id = ?";
 
-    private static final String SQL_QUERY_GET_CONFIRMED_FRIENDS = "SELECT id FROM users_filmorate WHERE id IN " +
-            "(SELECT f1.user2_id FROM friendship AS f1 JOIN friendship AS f2 " +
-            "ON f1.user1_id = ? AND f1.user2_id = f2.user1_id)";
+    private static final String SQL_QUERY_GET_CONFIRMED_FRIENDS = "SELECT f1.user2_id FROM friendship AS f1 " +
+            "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id WHERE f1.user1_id = ?";
 
-    private static final String SQL_QUERY_GET_FRIENDS_REQUESTS = "SELECTid FROM users_filmorate WHERE id IN " +
-            "(SELECT user1_id FROM friendship WHERE user2_id = ?) AND NOT IN" +
-            "(SELECT f1.user1_id FROM friendship AS f1 JOIN friendship AS f2 " +
-            "ON f1.user2_id = f2.user1_id AND f1.user1_id = ?";
+    private static final String SQL_QUERY_GET_USER_FRIENDS = "SELECT u.id, u.email, u.login, u.name, u.birthday FROM users_filmorate AS u RIGHT JOIN " +
+            "friendship AS f ON u.id = f.user2_id WHERE f.user1_id = ?";
+
+    private static final String SQL_QUERY_GET_FRIENDS_REQUESTS = "SELECT user1_id FROM friendship WHERE user2_id = ? AND NOT IN" +
+            "SELECT f1.user2_id FROM friendship AS f1 " +
+            "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id WHERE f1.user1_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -43,12 +43,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_QUERY_GET_USER_BY_ID, this::mapRowToUser, id);
+        return jdbcTemplate.queryForObject(SQL_QUERY_GET_USER_BY_ID, FilmorateRowMappers::getUser, id);
     }
 
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query(SQL_QUERY_GET_ALL_USERS, this::mapRowToUser);
+        return jdbcTemplate.query(SQL_QUERY_GET_ALL_USERS, FilmorateRowMappers::getUser);
     }
 
     @Override
@@ -68,26 +68,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public List<Integer> getUserFriends(int id) {
-        return jdbcTemplate.query(SQL_QUERY_GET_CONFIRMED_FRIENDS,this::getIdFromRow, id);
+    public List<User> getUserFriends(int id) {
+        return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, id);
     }
 
     @Override
     public List<Integer> getFriendRequests(int id) {
-        return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, this::getIdFromRow, id);
-    }
-
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return User.builder()
-                .id(resultSet.getInt("ID"))
-                .email(resultSet.getString("EMAIL"))
-                .login(resultSet.getString("LOGIN"))
-                .name(resultSet.getString("NAME"))
-                .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
-                .build();
-    }
-
-    private int getIdFromRow(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("ID");
+        return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, FilmorateRowMappers::getIdForUser, id);
     }
 }

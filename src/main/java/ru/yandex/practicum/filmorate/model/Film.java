@@ -10,16 +10,14 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
 public class Film {
 
-    @With private
-    int id;
+    @With
+    private int id;
     @NotNull(message = "Film name shouldn't be null.")
     @NotBlank(message = "Film name shouldn't be empty.")
     private String name;

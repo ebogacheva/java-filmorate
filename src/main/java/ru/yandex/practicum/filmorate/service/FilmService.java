@@ -34,8 +34,9 @@ public class FilmService {
     private LikeService likeService;
 
     public Film create(Film film) {
-        log.info("Добавлен фильм {}", film);
-        return filmDbStorage.create(film);
+        Film createdFilm = filmDbStorage.create(film);
+        log.info(Constants.FILM_ADDED_LOG, film);
+        return createdFilm;
     }
 
     public Film getById(int filmId) {
@@ -43,8 +44,8 @@ public class FilmService {
         try {
             film = filmDbStorage.getById(filmId);
         } catch (DataAccessException ex) {
-            log.info("Фильма не найден: {}", filmId);
-            throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
+            log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
+            throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
         }
         return film;
     }
@@ -56,23 +57,24 @@ public class FilmService {
     public List<User> getAllFilmLikes(int filmId) {
         checkFilmsExistenceById(filmId);
         List<Integer> likes = likeService.getAllFilmLikes(filmId);
+        log.info(Constants.USERS_LIKES_LOG, filmId, likes.size());
         return userService.getUsersList(likes);
     }
 
     public Film update(Film film) {
         checkFilmsExistenceById(film.getId());
-        log.info("Обновлена информация о фильме {}", film);
+        log.info(Constants.UPDATED_FILM_LOG, film);
         return filmDbStorage.update(film);
     }
 
     public void delete(int filmId) {
         try {
             if (filmDbStorage.delete(filmId)) {
-                log.info("Удален фильм: {}", filmId);
+                log.info(Constants.DELETED_FILM_LOG, filmId);
             }
         } catch (DataAccessException ex) {
-            log.info("Фильм не найден: {}", filmId);
-            throw new NoSuchUserException(Constants.FILM_NOT_FOUND_INFO);
+            log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
+            throw new NoSuchUserException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 

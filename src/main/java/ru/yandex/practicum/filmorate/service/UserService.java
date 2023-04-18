@@ -36,16 +36,15 @@ public class UserService {
             user = userDbStorage.getById(userId);
         } catch (DataAccessException ex) {
             log.info("Пользователь не найден: {}", userId);
-            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
+            throw new NoSuchUserException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
         return user;
     }
 
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        // TODO: DO we need it here?
         try {
-            userDbStorage.findAll();
+            users = userDbStorage.findAll();
         } catch (DataAccessException ignored) {
         }
         return users;
@@ -66,7 +65,7 @@ public class UserService {
             }
         } catch (DataAccessException ex) { // TODO: not sure
             log.info("Пользователь не найден: {}", id);
-            throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
+            throw new NoSuchUserException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 
@@ -83,15 +82,17 @@ public class UserService {
     }
 
     public List<User> friends(int userId) {
-        checkUsersExistenceById(userId);
-        Set<Integer> friendsId = new HashSet<>(userDbStorage.getUserFriends(userId));
-        return getUsersList(new ArrayList<>(emptyIfNull(friendsId)));
+        //checkUsersExistenceById(userId);
+        List<User> friends = userDbStorage.getUserFriends(userId);
+        System.out.println("hhhhhhhhhhhhhhh" + friends);
+        return friends;
     }
 
     public List<User> getFriendsRequests(int userId) {
         checkUsersExistenceById(userId);
         Set<Integer> requests = new HashSet<>(userDbStorage.getFriendRequests(userId));
-        return getUsersList(new ArrayList<>(emptyIfNull(requests)));
+        List<User> list = getUsersList(new ArrayList<>(emptyIfNull(requests)));
+        return list;
     }
 
     public void confirmFriendRequest (int userId, int otherId) {
@@ -101,11 +102,11 @@ public class UserService {
 
     public List<User> commonFriends(int userId, int otherId) {
         checkUsersExistenceById(userId, otherId);
-        Collection<Integer> userFriends = emptyIfNull(userDbStorage.getUserFriends(userId));
-        Collection<Integer> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
-        List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
+        Collection<User> userFriends = emptyIfNull(userDbStorage.getUserFriends(userId));
+        Collection<User> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
+        List<User> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         log.info("Общие друзья {} и {}: {}.", userId, otherId, intersection);
-        return getUsersList(intersection);
+        return intersection;
     }
 
     public List<User> getUsersList(List<Integer> ids) {

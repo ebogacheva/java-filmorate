@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
 import java.util.List;
@@ -17,21 +18,21 @@ public class FilmGenreDbStorage implements FilmGenreStorage{
 
     private final static String SQL_QUERY_ADD_GENRE_FOR_FILM = "INSERT INTO film_genre (film_id, genre_id) values(?, ?)";
     private final static String SQL_QUERY_DELETE_FILM_GENRES = "DELETE FROM film_genre WHERE film_id = ?";
-    private final static String SQL_QUERY_GET_ALL_FILM_GENRES = "SELECT g.id, g.name FROM genre AS g LEFT JOIN film_genre AS fg " +
-            "ON g.id = fg.genre_id WHERE fg.film_id = ?";
-    private final static String NEW_GENRE_FOR_FILM_INFO = "Добавлен новый жанр {} к фильму {}.";
-    private final static String GOT_ALL_GENRES_FOR_FILM_INFO = "Из базы получены все жанры фильма {}.";
+    private final static String SQL_QUERY_GET_ALL_FILM_GENRES =
+            "SELECT g.id, g.name FROM genre AS g " +
+                    "LEFT JOIN film_genre AS fg ON g.id = fg.genre_id WHERE fg.film_id = ?";
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void addFilmGenre(int filmId, int genreId) {
         jdbcTemplate.update(SQL_QUERY_ADD_GENRE_FOR_FILM, filmId, genreId);
-        log.info(NEW_GENRE_FOR_FILM_INFO, genreId, filmId);
+        log.info(Constants.NEW_GENRE_FOR_FILM_LOG, genreId, filmId);
     }
 
     @Override
-    public void deleteFilmGenre(int filmId) {
-        jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRES, filmId);
+    public boolean deleteFilmGenre(int filmId) {
+        return jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRES, filmId) > 0;
     }
 
     @Override
@@ -39,7 +40,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage{
         List<Genre> genres;
         try {
             genres = jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_GENRES, FilmorateRowMappers::getGenre, filmId);
-            log.info(GOT_ALL_GENRES_FOR_FILM_INFO, filmId);
+            log.info(Constants.GOT_ALL_GENRES_FOR_FILM_LOG, filmId);
             return genres;
         } catch (DataAccessException ignored) {
             return List.of();

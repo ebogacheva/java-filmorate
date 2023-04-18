@@ -34,8 +34,9 @@ public class UserService {
         User user;
         try {
             user = userDbStorage.getById(userId);
+            log.info(Constants.GOT_USER_BY_ID_LOG, userId);
         } catch (DataAccessException ex) {
-            log.info("Пользователь не найден: {}", userId);
+            log.warn(Constants.USER_NOT_FOUND_LOG, userId);
             throw new NoSuchUserException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
         return user;
@@ -53,18 +54,19 @@ public class UserService {
     public User update(User user) {
         checkUsersExistenceById(user.getId());
         String name = getCorrectName(user);
-        User userUpdated = user.withName(name);
-        log.info("Обновлен пользователь: {}", userUpdated.getId());
-        return userDbStorage.update(userUpdated);
+        User userWithCorrectName = user.withName(name);
+        User updated = userDbStorage.update(userWithCorrectName);
+        log.info(Constants.UPDATED_USER_LOG, updated.getId());
+        return updated;
     }
 
     public void delete(int id) {
         try {
             if (userDbStorage.delete(id)) {
-                log.info("Удален пользователь: {}", id);
+                log.info(Constants.USER_DELETED_LOG, id);
             }
         } catch (DataAccessException ex) {
-            log.info("Пользователь не найден: {}", id);
+            log.warn(Constants.USER_NOT_FOUND_LOG, id);
             throw new NoSuchUserException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
     }
@@ -72,29 +74,41 @@ public class UserService {
     public void sendFriendRequest(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
         friendshipDbStorage.sendFriendRequest(userId, friendId);
-        log.info("Пользователь {} отправил запрос в друзья пользователю {}", userId, friendId);
+        log.info(Constants.SENT_FRIEND_REQUEST_LOG, userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
         friendshipDbStorage.deleteFriend(userId, friendId);
-        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
+        log.info(Constants.DELETE_FROM_FRIENDS_LOG, userId, friendId);
     }
 
     public List<User> friends(int userId) {
         checkUsersExistenceById(userId);
-        return userDbStorage.getUserFriends(userId);
+        List<User> friends = userDbStorage.getUserFriends(userId);
+        log.info(Constants.SENT_FRIEND_REQUEST_LOG, userId, friends.size());
+        return friends;
+    }
+
+    public List<User> confirmedFriends(int userId) {
+        checkUsersExistenceById(userId);
+        List<Integer> confirmedFriendsIds = friendshipDbStorage.getConfirmedFriends(userId);
+        List<User> confirmedFriends = new ArrayList<>();
+        confirmedFriendsIds.forEach(id -> confirmedFriends.add(getById(id)));
+        return confirmedFriends;
     }
 
     public List<User> getFriendsRequests(int userId) {
         checkUsersExistenceById(userId);
         Set<Integer> requests = new HashSet<>(friendshipDbStorage.getFriendRequests(userId));
+        log.info(Constants.USER_FRIENDS_REQUESTS_LOG, userId, requests.size());
         return getUsersList(new ArrayList<>(emptyIfNull(requests)));
     }
 
     public void confirmFriendRequest (int userId, int otherId) {
         checkUsersExistenceById(userId, otherId);
         friendshipDbStorage.confirmRequest(userId, otherId);
+        log.info(Constants.CONFIRM_REQUEST_LOG, userId, otherId);
     }
 
     public List<User> commonFriends(int userId, int otherId) {
@@ -102,7 +116,7 @@ public class UserService {
         Collection<User> userFriends = emptyIfNull(userDbStorage.getUserFriends(userId));
         Collection<User> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
         List<User> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
-        log.info("Общие друзья {} и {}: {}.", userId, otherId, intersection);
+        log.info(Constants.COMMON_FRIENDS_LOG, userId, otherId, intersection);
         return intersection;
     }
 

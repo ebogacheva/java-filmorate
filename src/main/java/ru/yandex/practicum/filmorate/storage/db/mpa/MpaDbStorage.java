@@ -16,8 +16,6 @@ public class MpaDbStorage implements MpaStorage{
     private static final String SQL_QUERY_GET_ALL_MPA = "SELECT id, name FROM mpa";
     private static final String SQL_QUERY_GET_MPA_BY_ID = "SELECT id, name FROM mpa WHERE id = ?";
 
-    private static final String GOT_MPA_BY_ID_INFO = "Из базы получена ифнормация о рейтингу MPA {}.";
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override

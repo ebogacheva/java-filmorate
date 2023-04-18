@@ -33,12 +33,4 @@ public class GenreService {
         return new ArrayList<>(genreDbStorage.getAllGenres());
     }
 
-    public List<Genre> getAllFilmGenresById(int filmId) {
-        return filmGenreDbStorage.getAllFilmGenresById(filmId);
-    }
-
-    public void addFilmGenre(int filmId, int genreId) {
-        filmGenreDbStorage.addFilmGenre(filmId, genreId);
-    }
-
 }

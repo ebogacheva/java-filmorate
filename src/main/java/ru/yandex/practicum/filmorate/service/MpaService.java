@@ -32,11 +32,4 @@ public class MpaService {
         return mpaDbStorage.getAll();
     }
 
-    public void addFilmMpa(int filmId, int mpaId) {
-        filmMpaDbStorage.addFilmMpa(filmId, mpaId);
-    }
-
-    public Mpa getFilmMpaById(int filmId) {
-        return filmMpaDbStorage.getFilmMpaById(filmId);
-    }
 }

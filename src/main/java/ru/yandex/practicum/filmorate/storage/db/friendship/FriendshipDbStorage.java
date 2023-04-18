@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoSuchFriendRequestException;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
@@ -41,13 +40,11 @@ public class FriendshipDbStorage implements FriendshipStorage{
     @Override
     public void sendFriendRequest(int userId, int friendId) {
         jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
-        log.info(Constants.SENT_FRIEND_REQUEST_LOG, userId, friendId);
     }
 
     @Override
     public void deleteFriend(int userId, int friendId) {
         jdbcTemplate.update(SQL_QUERY_DELETE_FRIEND, userId, friendId);
-        log.info(Constants.DELETE_FROM_FRIENDS_LOG, userId, friendId);
     }
 
     @Override
@@ -55,7 +52,6 @@ public class FriendshipDbStorage implements FriendshipStorage{
         List<Integer> requests = getFriendRequests(userId);
         if (requests.contains(friendId)) {
             jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
-            log.info(Constants.CONFIRM_REQUEST_LOG, userId, friendId);
         } else {
             throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
         }

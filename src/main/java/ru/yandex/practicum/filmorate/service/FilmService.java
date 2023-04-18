@@ -43,8 +43,9 @@ public class FilmService {
         Film film;
         try {
             film = filmDbStorage.getById(filmId);
+            log.info(Constants.GOT_FILM_BY_ID, filmId);
         } catch (DataAccessException ex) {
-            log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
+            log.warn(Constants.FILM_NOT_FOUND_LOG, filmId);
             throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
         }
         return film;
@@ -73,7 +74,7 @@ public class FilmService {
                 log.info(Constants.DELETED_FILM_LOG, filmId);
             }
         } catch (DataAccessException ex) {
-            log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
+            log.warn(Constants.FILM_NOT_FOUND_LOG, filmId);
             throw new NoSuchUserException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
         }
     }

@@ -34,7 +34,6 @@ class UserDbStorageTest {
     void createUser() {
         User user = getUserForTesting(1);
         User actual = userDbStorage.create(user);
-        System.out.println("created" + actual);
         User expected = user.withId(actual.getId());
         compareUserFields(expected, actual);
     }
@@ -49,10 +48,8 @@ class UserDbStorageTest {
 
     @Test
     void findAll() {
-        User user1 = getUserForTesting(1);
-        userDbStorage.create(user1);
-        User user2 = getUserForTesting(2);
-        userDbStorage.create(user2);
+        userDbStorage.create(getUserForTesting(1));
+        userDbStorage.create(getUserForTesting(2));
         List<User> actual = userDbStorage.findAll();
         assertEquals(2, actual.size());
     }
@@ -61,7 +58,7 @@ class UserDbStorageTest {
     void update() {
         User created = userDbStorage.create(getUserForTesting(1));
         created.setEmail("new@email.ru");
-        User updated = userDbStorage.update(created);
+        userDbStorage.update(created);
         User actual = userDbStorage.getById(created.getId());
         assertThat(actual).hasFieldOrPropertyWithValue("email", "new@email.ru");
     }

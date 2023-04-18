@@ -64,7 +64,7 @@ public class FilmService {
 
     public Film update(Film film) {
         checkFilmsExistenceById(film.getId());
-        log.info(Constants.UPDATED_FILM_LOG, film);
+        log.info(Constants.UPDATED_FILM_LOG, film.getId());
         return filmDbStorage.update(film);
     }
 

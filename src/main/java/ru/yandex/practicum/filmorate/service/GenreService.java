@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchGenreException;
@@ -17,7 +18,6 @@ import java.util.List;
 public class GenreService {
 
     private final GenreStorage genreDbStorage;
-    private final FilmGenreStorage filmGenreDbStorage;
 
     public Genre getGenreById(int id) {
         Genre genre;

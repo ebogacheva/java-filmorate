@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchMpaException;
@@ -16,6 +17,7 @@ import java.util.List;
 public class MpaService {
 
     private final MpaStorage mpaDbStorage;
+
     private final FilmMpaStorage filmMpaDbStorage;
 
     public Mpa getMpaById(int id) {

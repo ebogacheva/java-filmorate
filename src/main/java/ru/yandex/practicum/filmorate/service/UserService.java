@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;

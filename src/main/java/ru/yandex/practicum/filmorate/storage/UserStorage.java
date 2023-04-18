@@ -10,10 +10,6 @@ public interface UserStorage {
     User getById(int id);
     User update(User user);
     List<User> findAll();
-
     boolean delete(int id);
-
     List<User> getUserFriends(int id);
-
-    List<Integer> getFriendRequests(int id);
 }

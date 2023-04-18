@@ -14,21 +14,23 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
-    private static final String SQL_QUERY_GET_USER_BY_ID = "SELECT * FROM users_filmorate WHERE id = ?";
-    private static final String SQL_QUERY_GET_ALL_USERS = "SELECT * FROM users_filmorate";
-    private static final String SQL_QUERY_UPDATE_USER = "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
+    private static final String SQL_QUERY_GET_USER_BY_ID =
+            "SELECT id, email, login, name, birthday " +
+                    "FROM users_filmorate WHERE id = ?";
+    private static final String SQL_QUERY_GET_ALL_USERS =
+            "SELECT id, email, login, name, birthday  " +
+            "FROM users_filmorate";
+    private static final String SQL_QUERY_UPDATE_USER =
+            "UPDATE users_filmorate SET email = ?, login = ?, name = ?, birthday = ? " +
             "WHERE id = ?";
-    private static final String SQL_QUERY_DELETE_USER_BY_ID = "DELETE FROM users_filmorate WHERE id = ?";
+    private static final String SQL_QUERY_DELETE_USER_BY_ID =
+            "DELETE FROM users_filmorate WHERE id = ?";
+    private static final String SQL_QUERY_GET_USER_FRIENDS =
+            "SELECT u.id, u.email, u.login, u.name, u.birthday " +
+                    "FROM users_filmorate AS u " +
+                    "RIGHT JOIN friendship AS f ON u.id = f.user2_id " +
+                    "WHERE f.user1_id = ?";
 
-    private static final String SQL_QUERY_GET_CONFIRMED_FRIENDS = "SELECT f1.user2_id FROM friendship AS f1 " +
-            "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id WHERE f1.user1_id = ?";
-
-    private static final String SQL_QUERY_GET_USER_FRIENDS = "SELECT u.id, u.email, u.login, u.name, u.birthday FROM users_filmorate AS u RIGHT JOIN " +
-            "friendship AS f ON u.id = f.user2_id WHERE f.user1_id = ?";
-
-    private static final String SQL_QUERY_GET_FRIENDS_REQUESTS = "SELECT user1_id FROM friendship WHERE user2_id = ? AND NOT IN" +
-            "SELECT f1.user2_id FROM friendship AS f1 " +
-            "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id WHERE f1.user1_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -68,12 +70,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getUserFriends(int id) {
-        return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, id);
-    }
-
-    @Override
-    public List<Integer> getFriendRequests(int id) {
-        return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, FilmorateRowMappers::getIdForUser, id);
+    public List<User> getUserFriends(int userId) {
+        return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, userId);
     }
 }

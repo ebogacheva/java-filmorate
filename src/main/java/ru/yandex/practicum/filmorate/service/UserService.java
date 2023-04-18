@@ -63,7 +63,7 @@ public class UserService {
             if (userDbStorage.delete(id)) {
                 log.info("Удален пользователь: {}", id);
             }
-        } catch (DataAccessException ex) { // TODO: not sure
+        } catch (DataAccessException ex) {
             log.info("Пользователь не найден: {}", id);
             throw new NoSuchUserException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
@@ -78,21 +78,18 @@ public class UserService {
     public void deleteFriend(int userId, int friendId) {
         checkUsersExistenceById(userId, friendId);
         friendshipDbStorage.deleteFriend(userId, friendId);
-        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId); //TODO: what with users' requests?
+        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
     public List<User> friends(int userId) {
-        //checkUsersExistenceById(userId);
-        List<User> friends = userDbStorage.getUserFriends(userId);
-        System.out.println("hhhhhhhhhhhhhhh" + friends);
-        return friends;
+        checkUsersExistenceById(userId);
+        return userDbStorage.getUserFriends(userId);
     }
 
     public List<User> getFriendsRequests(int userId) {
         checkUsersExistenceById(userId);
-        Set<Integer> requests = new HashSet<>(userDbStorage.getFriendRequests(userId));
-        List<User> list = getUsersList(new ArrayList<>(emptyIfNull(requests)));
-        return list;
+        Set<Integer> requests = new HashSet<>(friendshipDbStorage.getFriendRequests(userId));
+        return getUsersList(new ArrayList<>(emptyIfNull(requests)));
     }
 
     public void confirmFriendRequest (int userId, int otherId) {

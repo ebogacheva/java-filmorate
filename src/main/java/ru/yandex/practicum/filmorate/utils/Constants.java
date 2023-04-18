@@ -13,4 +13,10 @@ public class Constants {
     public static final String USERS_LIKES_LOG = "Фильм {} нравится {} пользователям.";
     public static final String UPDATED_FILM_LOG = "Обновлена информация о фильме {}.";
     public static final String DELETED_FILM_LOG = "Удален фильм: {}.";
+    public static final String USER_LIKE_FILM_LOG = "Пользователю {} нравится фильм {}.";
+    public static final String USER_DISLIKE_FILM_LOG = "Пользователю {} больше не нравится фильм {}.";
+    public static final String GOT_GENRE_BY_ID_LOG = "Из базы получена ифнормация о жанре {}.";
+    public static final String SENT_FRIEND_REQUEST_LOG = "Пользователь {} отправил запрос на дружбу пользователю {}.";
+    public static final String DELETE_FROM_FRIENDS_LOG = "Пользователь {} больше не дружит с пользователем {}.";
+    public static final String CONFIRM_REQUEST_LOG = "Пользователь {} подтвердил дружбу с пользователем {}.";
 }

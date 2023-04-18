@@ -24,10 +24,14 @@ public class FriendshipDbStorage implements FriendshipStorage{
             "DELETE FROM friendship WHERE user1_id = ? and user2_id = ?";
     private static final String SQL_QUERY_GET_CONFIRMED_FRIENDS =
             "SELECT f1.user2_id FROM friendship AS f1 " +
-                    "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id WHERE f1.user1_id = ?";
+                    "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id " +
+                    "AND f2.user2_id = f1.user1_id WHERE f1.user1_id = ?";
     private static final String SQL_QUERY_GET_FRIENDS_REQUESTS =
-            "SELECT user1_id FROM friendship WHERE user2_id = ? AND NOT IN" +
-                    SQL_QUERY_GET_CONFIRMED_FRIENDS;
+            "SELECT user1_id FROM friendship WHERE user2_id = ? " +
+                    "AND user1_id NOT IN " +
+            "(SELECT f1.user2_id FROM friendship AS f1 " +
+                    "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id " +
+                    "AND f2.user2_id = f1.user1_id WHERE f1.user1_id = ?)";
 
     private final JdbcTemplate jdbcTemplate;
 

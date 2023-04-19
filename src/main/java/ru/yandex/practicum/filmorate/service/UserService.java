@@ -106,7 +106,7 @@ public class UserService {
         return getUsersList(new ArrayList<>(emptyIfNull(requests)));
     }
 
-    public void confirmFriendRequest (int userId, int otherId) {
+    public void confirmFriendRequest(int userId, int otherId) {
         checkUsersExistenceById(userId, otherId);
         friendshipDbStorage.confirmRequest(userId, otherId);
         log.info(Constants.CONFIRM_REQUEST_LOG, userId, otherId);

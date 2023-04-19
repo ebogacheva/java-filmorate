@@ -24,7 +24,7 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Genre getGenreById(int genreId) {
-        Genre genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID , FilmorateRowMappers::getGenre, genreId);
+        Genre genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID, FilmorateRowMappers::getGenre, genreId);
         log.info(Constants.GOT_GENRE_BY_ID_LOG, genreId);
         return genre;
     }

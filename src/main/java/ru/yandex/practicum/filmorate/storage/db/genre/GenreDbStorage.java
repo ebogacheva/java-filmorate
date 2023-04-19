@@ -33,6 +33,4 @@ public class GenreDbStorage implements GenreStorage {
     public List<Genre> getAllGenres() {
         return new ArrayList<>(jdbcTemplate.query(SQL_QUERY_GET_ALL_GENRES, FilmorateRowMappers::getGenre));
     }
-
-
 }

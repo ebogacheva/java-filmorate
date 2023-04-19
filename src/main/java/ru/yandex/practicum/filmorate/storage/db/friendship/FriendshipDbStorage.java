@@ -67,6 +67,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
             throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
         }
     }
+
     @Override
     public List<Integer> getFriendRequests(int userId) {
         return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, FilmorateRowMappers::getIdForUser1, userId, userId);

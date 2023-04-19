@@ -27,6 +27,4 @@ public class MpaDbStorage implements MpaStorage{
     public List<Mpa> getAll() {
         return jdbcTemplate.query(SQL_QUERY_GET_ALL_MPA, FilmorateRowMappers::getMpa);
     }
-
-
 }

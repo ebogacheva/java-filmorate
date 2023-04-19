@@ -11,7 +11,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MpaDbStorage implements MpaStorage{
+public class MpaDbStorage implements MpaStorage {
 
     private static final String SQL_QUERY_GET_ALL_MPA = "SELECT id, name FROM mpa";
     private static final String SQL_QUERY_GET_MPA_BY_ID = "SELECT id, name FROM mpa WHERE id = ?";

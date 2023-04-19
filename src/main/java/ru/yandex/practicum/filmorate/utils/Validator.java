@@ -50,7 +50,7 @@ public class Validator {
             log.warn(VALIDATION_USER_ERROR_BASIC_MESSAGE + LOGIN_INVALID_MESSAGE);
             throw new ValidationException(LOGIN_INVALID_MESSAGE);
         }
-        if (Objects.isNull(user.getName()) || user.getName().isBlank()){
+        if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {

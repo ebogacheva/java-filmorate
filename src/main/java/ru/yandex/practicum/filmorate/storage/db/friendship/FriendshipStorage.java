@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 public interface FriendshipStorage {
-
     void sendFriendRequest(int userId, int friendId);
 
     void deleteFriend(int userId, int friendId);

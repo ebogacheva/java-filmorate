@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public interface GenreStorage {
-
     Genre getGenreById(int genreId);
     List<Genre> getAllGenres();
 }

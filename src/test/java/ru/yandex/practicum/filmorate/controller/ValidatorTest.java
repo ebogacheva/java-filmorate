@@ -51,6 +51,7 @@ class ValidatorTest {
         Film film = TestDataProvider.getFilmWithInvalidDuration();
         assertThrows(ValidationException.class, () -> Validator.isValidated(film));
     }
+
     @Test
     void validatedUserWithValidData() {
         User user = TestDataProvider.getUserWithValidData();

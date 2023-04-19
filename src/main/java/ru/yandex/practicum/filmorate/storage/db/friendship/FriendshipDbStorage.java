@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FriendshipDbStorage implements FriendshipStorage{
+public class FriendshipDbStorage implements FriendshipStorage {
 
     private static final String SQL_QUERY_SEND_FRIEND_REQUEST =
             "INSERT INTO friendship (user1_id, user2_id) VALUES (?, ?)";

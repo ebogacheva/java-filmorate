@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class LikeDbStorage implements LikeStorage{
+public class LikeDbStorage implements LikeStorage {
 
     private static final String SQL_QUERY_LIKE_FILM =
             "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";

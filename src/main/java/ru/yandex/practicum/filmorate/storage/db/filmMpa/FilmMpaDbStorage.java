@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FilmMpaDbStorage implements FilmMpaStorage{
+public class FilmMpaDbStorage implements FilmMpaStorage {
 
     private static final String SQL_QUERY_GET_MPA_BY_FILM_ID =
             "SELECT mpa.id, mpa.name " +

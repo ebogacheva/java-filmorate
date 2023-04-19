@@ -13,7 +13,7 @@ import java.util.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorage{
+public class GenreDbStorage implements GenreStorage {
 
     private static final String SQL_QUERY_GET_GENRE_BY_ID =
             "SELECT genre.id, genre.name FROM genre WHERE id = ?";

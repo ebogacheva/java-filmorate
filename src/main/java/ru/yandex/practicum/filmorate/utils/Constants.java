@@ -21,7 +21,6 @@ public class Constants {
     public static final String SENT_FRIEND_REQUEST_LOG = "Пользователь {} отправил запрос на дружбу пользователю {}.";
     public static final String DELETE_FROM_FRIENDS_LOG = "Пользователь {} больше не дружит с пользователем {}.";
     public static final String USER_FRIENDS_REQUESTS_LOG = "У пользователя {} - {} запросов на дружбу.";
-    public static final String USER_SENT_REQUESTS_LOG = "Пользователь {} добавил в друзья {} человек.";
     public static final String CONFIRM_REQUEST_LOG = "Пользователь {} подтвердил дружбу с пользователем {}.";
     public static final String NEW_GENRE_FOR_FILM_LOG = "Добавлен новый жанр {} к фильму {}.";
     public static final String GOT_ALL_GENRES_FOR_FILM_LOG = "Из базы получены все жанры фильма {}.";

@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchGenreException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.db.filmGenre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.db.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 

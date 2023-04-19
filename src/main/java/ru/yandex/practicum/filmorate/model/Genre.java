@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder(toBuilder = true)
 @EqualsAndHashCode(exclude = "name")
-public class Genre implements Comparable<Genre>{
+public class Genre implements Comparable<Genre> {
 
     private int id;
     private String name;

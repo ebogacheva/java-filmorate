@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.db.friendship;
 
 import org.springframework.data.relational.core.sql.In;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
@@ -11,4 +12,5 @@ public interface FriendshipStorage {
     void confirmRequest(int userId, int friendId);
     List<Integer> getConfirmedFriends(int userId);
     List<Integer> getFriendRequests(int userId);
+    List<User> getUserFriends(int userId);
 }

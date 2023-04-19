@@ -25,12 +25,6 @@ public class UserDbStorage implements UserStorage {
             "WHERE id = ?";
     private static final String SQL_QUERY_DELETE_USER_BY_ID =
             "DELETE FROM users_filmorate WHERE id = ?";
-    private static final String SQL_QUERY_GET_USER_FRIENDS =
-            "SELECT u.id, u.email, u.login, u.name, u.birthday " +
-                    "FROM users_filmorate AS u " +
-                    "RIGHT JOIN friendship AS f ON u.id = f.user2_id " +
-                    "WHERE f.user1_id = ?";
-
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -69,8 +63,5 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.update(SQL_QUERY_DELETE_USER_BY_ID, id) > 0;
     }
 
-    @Override
-    public List<User> getUserFriends(int userId) {
-        return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, userId);
-    }
+
 }

@@ -86,7 +86,7 @@ public class UserService {
 
     public List<User> friends(int userId) {
         checkUsersExistenceById(userId);
-        List<User> friends = userDbStorage.getUserFriends(userId);
+        List<User> friends = friendshipDbStorage.getUserFriends(userId);
         log.info(Constants.SENT_FRIEND_REQUEST_LOG, userId, friends.size());
         return friends;
     }
@@ -114,8 +114,8 @@ public class UserService {
 
     public List<User> commonFriends(int userId, int otherId) {
         checkUsersExistenceById(userId, otherId);
-        Collection<User> userFriends = emptyIfNull(userDbStorage.getUserFriends(userId));
-        Collection<User> otherFriends = emptyIfNull(userDbStorage.getUserFriends(otherId));
+        Collection<User> userFriends = emptyIfNull(friendshipDbStorage.getUserFriends(userId));
+        Collection<User> otherFriends = emptyIfNull(friendshipDbStorage.getUserFriends(otherId));
         List<User> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
         log.info(Constants.COMMON_FRIENDS_LOG, userId, otherId, intersection);
         return intersection;

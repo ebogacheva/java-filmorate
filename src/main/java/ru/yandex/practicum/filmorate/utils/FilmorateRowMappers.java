@@ -35,6 +35,14 @@ public class FilmorateRowMappers {
         return resultSet.getInt("ID");
     }
 
+    public static int getIdForUser1(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("user1_id");
+    }
+
+    public static int getIdForUser2(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("user2_id");
+    }
+
     public static int getUserId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("USER_ID");
     }

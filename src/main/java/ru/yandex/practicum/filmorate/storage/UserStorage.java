@@ -11,5 +11,4 @@ public interface UserStorage {
     User update(User user);
     List<User> findAll();
     boolean delete(int id);
-    List<User> getUserFriends(int id);
 }

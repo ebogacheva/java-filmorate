@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoSuchFriendRequestException;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
@@ -31,11 +32,21 @@ public class FriendshipDbStorage implements FriendshipStorage{
             "(SELECT f1.user2_id FROM friendship AS f1 " +
                     "JOIN friendship AS f2 ON f1.user2_id = f2.user1_id " +
                     "AND f2.user2_id = f1.user1_id WHERE f1.user1_id = ?)";
+    private static final String SQL_QUERY_GET_USER_FRIENDS =
+            "SELECT u.id, u.email, u.login, u.name, u.birthday " +
+                    "FROM users_filmorate AS u " +
+                    "RIGHT JOIN friendship AS f ON u.id = f.user2_id " +
+                    "WHERE f.user1_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     private final UserStorage userDbStorage;
+
+    @Override
+    public List<User> getUserFriends(int userId) {
+        return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, userId);
+    }
 
     @Override
     public void sendFriendRequest(int userId, int friendId) {
@@ -58,11 +69,11 @@ public class FriendshipDbStorage implements FriendshipStorage{
     }
     @Override
     public List<Integer> getFriendRequests(int userId) {
-        return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, FilmorateRowMappers::getIdForUser, userId);
+        return jdbcTemplate.query(SQL_QUERY_GET_FRIENDS_REQUESTS, FilmorateRowMappers::getIdForUser1, userId, userId);
     }
 
     @Override
     public List<Integer> getConfirmedFriends(int userId) {
-        return jdbcTemplate.query(SQL_QUERY_GET_CONFIRMED_FRIENDS, FilmorateRowMappers::getIdForUser, userId);
+        return jdbcTemplate.query(SQL_QUERY_GET_CONFIRMED_FRIENDS, FilmorateRowMappers::getIdForUser2, userId);
     }
 }

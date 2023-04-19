@@ -98,7 +98,7 @@ public class FilmDbStorage implements FilmStorage {
 
         clearDbFilmMpaAndGenre(filmId);
 
-        if (Objects.nonNull(film.getMpa())){
+        if (Objects.nonNull(film.getMpa())) {
             int mpaId = film.getMpa().getId();
             filmMpaDbStorage.setFilmMpa(filmId, mpaId);
         }

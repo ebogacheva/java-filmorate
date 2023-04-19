@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
 
         if (Objects.nonNull(film.getMpa())){
             int mpaId = film.getMpa().getId();
-            filmMpaDbStorage.addFilmMpa(filmId, mpaId);
+            filmMpaDbStorage.setFilmMpa(filmId, mpaId);
         }
         if (Objects.nonNull(film.getGenres())) {
             Set<Genre> genres = film.getGenres();
@@ -118,7 +118,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private void clearDbFilmMpaAndGenre(int filmId) {
         filmMpaDbStorage.deleteFilmMap(filmId);
-        filmGenreDbStorage.deleteFilmGenre(filmId);
+        List<Genre> genres = filmGenreDbStorage.getAllFilmGenresById(filmId);
+        genres.forEach(genre -> filmGenreDbStorage.deleteFilmGenre(filmId, genre.getId()));
     }
 
 }

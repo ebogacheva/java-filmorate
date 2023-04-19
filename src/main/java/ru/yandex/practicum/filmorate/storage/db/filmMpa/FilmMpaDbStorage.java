@@ -26,7 +26,8 @@ public class FilmMpaDbStorage implements FilmMpaStorage{
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addFilmMpa(int filmId, int mpaId) {
+    public void setFilmMpa(int filmId, int mpaId) {
+        deleteFilmMap(filmId);
         jdbcTemplate.update(SQL_QUERY_ADD_FILM_MPA, filmId, mpaId);
         log.info(SAVED_FILM_MPA_INFO, mpaId, filmId);
     }

@@ -31,10 +31,6 @@ public class FilmorateRowMappers {
                 .build();
     }
 
-    public static int getIdForUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("ID");
-    }
-
     public static int getIdForUser1(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("user1_id");
     }
@@ -60,5 +56,4 @@ public class FilmorateRowMappers {
                 .name(resultSet.getString("NAME"))
                 .build();
     }
-
 }

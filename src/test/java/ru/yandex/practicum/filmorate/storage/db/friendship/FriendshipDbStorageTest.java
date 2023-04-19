@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 
@@ -79,7 +78,6 @@ class FriendshipDbStorageTest {
         friendshipDbStorage.sendFriendRequest(user1.getId(), user3.getId());
         friendshipDbStorage.sendFriendRequest(user2.getId(), user3.getId());
         friendshipDbStorage.confirmRequest(user3.getId(), user2.getId());
-        List<Integer> requests = friendshipDbStorage.getFriendRequests(user3.getId());
         assertEquals(user1.getId(), friendshipDbStorage.getFriendRequests(user3.getId()).get(0));
     }
 

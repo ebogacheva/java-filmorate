@@ -33,6 +33,7 @@ public class LikeDbStorage implements LikeStorage{
     public void dislikeFilm(int filmId, int userId) {
         jdbcTemplate.update(SQL_QUERY_DISLIKE_FILM, filmId, userId);
         log.info(Constants.USER_DISLIKE_FILM_LOG, userId, filmId);
+
     }
 
     @Override

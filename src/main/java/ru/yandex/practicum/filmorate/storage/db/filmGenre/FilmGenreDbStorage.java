@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.db.filmGenre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -18,7 +17,7 @@ import java.util.List;
 public class FilmGenreDbStorage implements FilmGenreStorage{
 
     private final static String SQL_QUERY_ADD_GENRE_FOR_FILM = "INSERT INTO film_genre (film_id, genre_id) values(?, ?)";
-    private final static String SQL_QUERY_DELETE_FILM_GENRES = "DELETE FROM film_genre WHERE film_id = ?";
+    private final static String SQL_QUERY_DELETE_FILM_GENRE = "DELETE FROM film_genre WHERE film_id = ? and genre_id = ?";
     private final static String SQL_QUERY_GET_ALL_FILM_GENRES =
             "SELECT g.id, g.name FROM genre AS g " +
                     "LEFT JOIN film_genre AS fg ON g.id = fg.genre_id WHERE fg.film_id = ?";
@@ -32,8 +31,8 @@ public class FilmGenreDbStorage implements FilmGenreStorage{
     }
 
     @Override
-    public boolean deleteFilmGenre(int filmId) {
-        return jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRES, filmId) > 0;
+    public boolean deleteFilmGenre(int filmId, int genreId) {
+        return jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRE, filmId, genreId) > 0;
     }
 
     @Override

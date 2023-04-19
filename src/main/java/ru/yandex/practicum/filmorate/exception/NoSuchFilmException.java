@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class NoSuchFilmException extends RuntimeException{
+public class NoSuchFilmException extends RuntimeException {
     public NoSuchFilmException(String s) {
         super(s);
     }

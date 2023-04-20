@@ -5,17 +5,16 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase
@@ -43,8 +42,9 @@ class UserDbStorageTest {
     void getById() {
         User user = getUserForTesting(1);
         User expected = userDbStorage.create(user);
-        User actual = userDbStorage.getById(expected.getId());
-        compareUserFields(expected, actual);
+        Optional<User> actual = userDbStorage.getById(expected.getId());
+        assertTrue(actual.isPresent());
+        compareUserFields(expected, actual.get());
     }
 
     @Test
@@ -60,15 +60,16 @@ class UserDbStorageTest {
         User created = userDbStorage.create(getUserForTesting(1));
         created.setEmail("new@email.ru");
         userDbStorage.update(created);
-        User actual = userDbStorage.getById(created.getId());
-        assertThat(actual).hasFieldOrPropertyWithValue("email", "new@email.ru");
+        Optional<User> actual = userDbStorage.getById(created.getId());
+        assertTrue(actual.isPresent());
+        assertThat(actual).get().hasFieldOrPropertyWithValue("email", "new@email.ru");
     }
 
     @Test
     void delete() {
         User created = userDbStorage.create(getUserForTesting(1));
-        userDbStorage.delete(created.getId());
-        assertThrows(DataAccessException.class, () -> userDbStorage.getById(created.getId()));
+        assertTrue(userDbStorage.delete(created.getId()));
+        assertThat(userDbStorage.getById(created.getId())).isEmpty();
     }
 
     private void compareUserFields(User expected, User actual) {

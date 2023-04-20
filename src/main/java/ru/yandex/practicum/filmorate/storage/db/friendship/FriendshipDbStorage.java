@@ -2,13 +2,9 @@ package ru.yandex.practicum.filmorate.storage.db.friendship;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NoSuchFriendRequestException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
 import java.util.List;
@@ -40,32 +36,27 @@ public class FriendshipDbStorage implements FriendshipStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private final UserStorage userDbStorage;
-
     @Override
     public List<User> getUserFriends(int userId) {
         return jdbcTemplate.query(SQL_QUERY_GET_USER_FRIENDS, FilmorateRowMappers::getUser, userId);
     }
 
     @Override
-    public void sendFriendRequest(int userId, int friendId) {
-        jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
+    public boolean sendFriendRequest(int userId, int friendId) {
+        return (jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId) > 0);
     }
 
     @Override
-    public void deleteFriend(int userId, int friendId) {
-        jdbcTemplate.update(SQL_QUERY_DELETE_FRIEND, userId, friendId);
+    public boolean deleteFriend(int userId, int friendId) {
+        return jdbcTemplate.update(SQL_QUERY_DELETE_FRIEND, userId, friendId) > 0;
     }
 
     @Override
-    public void confirmRequest(int userId, int friendId) {
+    public boolean confirmRequest(int userId, int friendId) {
         List<Integer> requests = getFriendRequests(userId);
         if (requests.contains(friendId)) {
-            jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId);
-        } else {
-            throw new NoSuchFriendRequestException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
-        }
+            return (jdbcTemplate.update(SQL_QUERY_SEND_FRIEND_REQUEST, userId, friendId) > 0);
+        } else return false;
     }
 
     @Override

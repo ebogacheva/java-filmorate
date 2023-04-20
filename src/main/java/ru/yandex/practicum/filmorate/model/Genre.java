@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Data
 @Builder(toBuilder = true)
 @EqualsAndHashCode(exclude = "name")

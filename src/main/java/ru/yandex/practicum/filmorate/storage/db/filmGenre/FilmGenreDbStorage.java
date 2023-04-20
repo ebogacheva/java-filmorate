@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.storage.db.filmGenre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
 import java.util.List;
@@ -27,23 +25,15 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
     @Override
     public void addFilmGenre(int filmId, int genreId) {
         jdbcTemplate.update(SQL_QUERY_ADD_GENRE_FOR_FILM, filmId, genreId);
-        log.info(Constants.NEW_GENRE_FOR_FILM_LOG, genreId, filmId);
     }
 
     @Override
-    public boolean deleteFilmGenre(int filmId, int genreId) {
-        return jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRE, filmId, genreId) > 0;
+    public void deleteFilmGenre(int filmId, int genreId) {
+        jdbcTemplate.update(SQL_QUERY_DELETE_FILM_GENRE, filmId, genreId);
     }
 
     @Override
     public List<Genre> getAllFilmGenresById(int filmId) {
-        List<Genre> genres;
-        try {
-            genres = jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_GENRES, FilmorateRowMappers::getGenre, filmId);
-            log.info(Constants.GOT_ALL_GENRES_FOR_FILM_LOG, filmId);
-            return genres;
-        } catch (DataAccessException ignored) {
-            return List.of();
-        }
+        return jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_GENRES, FilmorateRowMappers::getGenre, filmId);
     }
 }

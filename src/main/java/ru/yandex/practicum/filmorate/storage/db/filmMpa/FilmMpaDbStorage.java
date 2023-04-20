@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.storage.db.filmMpa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -20,16 +22,12 @@ public class FilmMpaDbStorage implements FilmMpaStorage {
     private static final String SQL_QUERY_ADD_FILM_MPA = "INSERT INTO film_mpa (film_id, mpa_id) VALUES (?, ?)";
     private static final String SQL_QUERY_DELETE_FILM_MPA = "DELETE FROM film_mpa WHERE film_id = ?";
 
-    private static final String SAVED_FILM_MPA_INFO = "Сохранен рейтинг MPA {} для фильма {}.";
-    private static final String GOT_FILM_MPA_INFO = "Из базы получен рейтинг MPA для фильма {}.";
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void setFilmMpa(int filmId, int mpaId) {
         deleteFilmMap(filmId);
         jdbcTemplate.update(SQL_QUERY_ADD_FILM_MPA, filmId, mpaId);
-        log.info(SAVED_FILM_MPA_INFO, mpaId, filmId);
     }
 
     @Override
@@ -38,14 +36,13 @@ public class FilmMpaDbStorage implements FilmMpaStorage {
     }
 
     @Override
-    public Mpa getFilmMpaById(int filmId) {
-        Mpa mpa = null;
+    public Optional<Mpa> getFilmMpaById(int filmId) {
+        Mpa mpa;
         try {
             mpa = jdbcTemplate.queryForObject(SQL_QUERY_GET_MPA_BY_FILM_ID,  FilmorateRowMappers::getMpa, filmId);
-            log.info(GOT_FILM_MPA_INFO, filmId);
-        } catch (DataAccessException ignored) {
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return Optional.empty();
         }
-        return mpa;
+        return Optional.ofNullable(mpa);
     }
-
 }

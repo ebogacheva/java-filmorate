@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.db.genre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -23,10 +24,15 @@ public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Genre getGenreById(int genreId) {
-        Genre genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID, FilmorateRowMappers::getGenre, genreId);
+    public Optional<Genre> getGenreById(int genreId) {
+        Genre genre;
+        try {
+            genre = jdbcTemplate.queryForObject(SQL_QUERY_GET_GENRE_BY_ID, FilmorateRowMappers::getGenre, genreId);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return Optional.empty();
+        }
         log.info(Constants.GOT_GENRE_BY_ID_LOG, genreId);
-        return genre;
+        return Optional.ofNullable(genre);
     }
 
     @Override

@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.storage.db.mpa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -19,8 +21,14 @@ public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Mpa getMpaById(int mpaId) {
-        return jdbcTemplate.queryForObject(SQL_QUERY_GET_MPA_BY_ID, FilmorateRowMappers::getMpa, mpaId);
+    public Optional<Mpa> getMpaById(int mpaId) {
+        Mpa mpa;
+        try {
+            mpa = jdbcTemplate.queryForObject(SQL_QUERY_GET_MPA_BY_ID, FilmorateRowMappers::getMpa, mpaId);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(mpa);
     }
 
     @Override

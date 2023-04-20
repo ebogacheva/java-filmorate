@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -103,13 +104,17 @@ class LikeDbStorageTest {
     }
 
     private Film getFilmForTesting(int index) {
+        Genre genre1 = genreStorage.getGenreById(1).orElse(null);
+        Genre genre2 = genreStorage.getGenreById(2).orElse(null);
+        assert genre1 != null;
+        assert genre2 != null;
         return Film.builder()
                 .name("name" + index)
                 .description(index + "description")
                 .releaseDate(LocalDate.of(1990, 1, 10))
                 .duration(120)
-                .mpa(mpaStorage.getMpaById(1))
-                .genres(Set.of(genreStorage.getGenreById(1), genreStorage.getGenreById(2)))
+                .mpa(mpaStorage.getMpaById(1).orElse(null))
+                .genres(Set.of(genre1, genre2))
                 .build();
     }
 }

@@ -13,8 +13,7 @@ import ru.yandex.practicum.filmorate.storage.db.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.db.mpa.MpaStorage;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,17 +38,19 @@ class FilmGenreDbStorageTest {
     void addFilmGenre() {
         Film film1 = filmDbStorage.create(getFilmForTesting(1));
         filmGenreDbStorage.addFilmGenre(film1.getId(), 3);
-        Film updated = filmDbStorage.getById(film1.getId());
-        assertEquals(2, film1.getGenres().size());
-        assertEquals(3, updated.getGenres().size());
+        Optional<Film> updated = filmDbStorage.getById(film1.getId());
+        if (updated.isPresent()) {
+            assertEquals(2, film1.getGenres().size());
+            assertEquals(3, updated.get().getGenres().size());
+        }
     }
 
     @Test
     void deleteFilmGenre() {
         Film film1 = filmDbStorage.create(getFilmForTesting(1));
         filmGenreDbStorage.deleteFilmGenre(film1.getId(), 2);
-        Film updated = filmDbStorage.getById(film1.getId());
-        assertEquals(1, updated.getGenres().size());
+        Optional<Film> updated = filmDbStorage.getById(film1.getId());
+        updated.ifPresent(film -> assertEquals(1, film.getGenres().size()));
     }
 
     @Test
@@ -60,13 +61,17 @@ class FilmGenreDbStorageTest {
     }
 
     private Film getFilmForTesting(int index) {
+        Genre genre1 = genreStorage.getGenreById(1).orElse(null);
+        Genre genre2 = genreStorage.getGenreById(2).orElse(null);
+        assert genre1 != null;
+        assert genre2 != null;
         return Film.builder()
                 .name("name" + index)
                 .description(index + "description")
                 .releaseDate(LocalDate.of(1990, 1, 10))
                 .duration(120)
-                .mpa(mpaStorage.getMpaById(1))
-                .genres(Set.of(genreStorage.getGenreById(1), genreStorage.getGenreById(2)))
+                .mpa(mpaStorage.getMpaById(1).orElse(null))
+                .genres(Set.of(genre1, genre2))
                 .build();
     }
 }

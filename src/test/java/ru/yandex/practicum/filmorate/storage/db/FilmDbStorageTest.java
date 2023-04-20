@@ -6,20 +6,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.db.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.db.mpa.MpaStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase
@@ -54,8 +54,9 @@ class FilmDbStorageTest {
     void getById() {
         Film film = getFilmForTesting(1);
         Film expected = filmDbStorage.create(film);
-        Film actual = filmDbStorage.getById(expected.getId());
-        compareFilmFields(expected, actual);
+        Optional<Film> actual = filmDbStorage.getById(expected.getId());
+        assertTrue(actual.isPresent());
+        compareFilmFields(expected, actual.get());
     }
 
     @Test
@@ -71,15 +72,16 @@ class FilmDbStorageTest {
         Film created = filmDbStorage.create(getFilmForTesting(1));
         created.setDescription("new description");
         filmDbStorage.update(created);
-        Film actual = filmDbStorage.getById(created.getId());
-        assertThat(actual).hasFieldOrPropertyWithValue("description", "new description");
+        Optional<Film> actual = filmDbStorage.getById(created.getId());
+        assertTrue(actual.isPresent());
+        assertThat(actual).get().hasFieldOrPropertyWithValue("description", "new description");
     }
 
     @Test
     void delete() {
         Film created = filmDbStorage.create(getFilmForTesting(1));
         filmDbStorage.delete(created.getId());
-        assertThrows(DataAccessException.class, () -> filmDbStorage.getById(created.getId()));
+        assertThat(filmDbStorage.getById(created.getId())).isEmpty();
     }
 
     private void compareFilmFields(Film expected, Film actual) {
@@ -93,13 +95,17 @@ class FilmDbStorageTest {
     }
 
     private Film getFilmForTesting(int index) {
+        Genre genre1 = genreStorage.getGenreById(1).orElse(null);
+        Genre genre2 = genreStorage.getGenreById(2).orElse(null);
+        assert genre1 != null;
+        assert genre2 != null;
         return Film.builder()
                 .name("name" + index)
                 .description(index + "description")
                 .releaseDate(LocalDate.of(1990, 1, 10))
                 .duration(120)
-                .mpa(mpaStorage.getMpaById(1))
-                .genres(Set.of(genreStorage.getGenreById(1), genreStorage.getGenreById(2)))
+                .mpa(mpaStorage.getMpaById(1).orElse(null))
+                .genres(Set.of(genre1, genre2))
                 .build();
     }
 }

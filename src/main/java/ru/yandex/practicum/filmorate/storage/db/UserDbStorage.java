@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getById(int id) {
-        return jdbcTemplate.queryForObject(SQL_QUERY_GET_USER_BY_ID, FilmorateRowMappers::getUser, id);
+    public Optional<User> getById(int id) {
+        User user;
+        try {
+            user = jdbcTemplate.queryForObject(SQL_QUERY_GET_USER_BY_ID, FilmorateRowMappers::getUser, id);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -48,20 +55,19 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) {
-        jdbcTemplate.update(SQL_QUERY_UPDATE_USER,
+    public Optional<User> update(User user) {
+        if (jdbcTemplate.update(SQL_QUERY_UPDATE_USER,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday(),
-                user.getId());
-        return user;
+                user.getId()) > 0) {
+            return Optional.of(user);
+        } else return Optional.empty();
     }
 
     @Override
     public boolean delete(int id) {
         return jdbcTemplate.update(SQL_QUERY_DELETE_USER_BY_ID, id) > 0;
     }
-
-
 }

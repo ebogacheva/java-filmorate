@@ -5,11 +5,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 public interface FriendshipStorage {
-    void sendFriendRequest(int userId, int friendId);
+    boolean sendFriendRequest(int userId, int friendId);
 
-    void deleteFriend(int userId, int friendId);
+    boolean deleteFriend(int userId, int friendId);
 
-    void confirmRequest(int userId, int friendId);
+    boolean confirmRequest(int userId, int friendId);
 
     List<Integer> getConfirmedFriends(int userId);
 

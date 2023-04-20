@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.utils.Constants;
 import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
 
 import java.util.List;
@@ -24,16 +23,13 @@ public class LikeDbStorage implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void likeFilm(int filmId, int userId) {
-        jdbcTemplate.update(SQL_QUERY_LIKE_FILM, filmId, userId);
-        log.info(Constants.USER_LIKE_FILM_LOG, userId, filmId);
+    public boolean likeFilm(int filmId, int userId) {
+        return jdbcTemplate.update(SQL_QUERY_LIKE_FILM, filmId, userId) > 0;
     }
 
     @Override
-    public void dislikeFilm(int filmId, int userId) {
-        jdbcTemplate.update(SQL_QUERY_DISLIKE_FILM, filmId, userId);
-        log.info(Constants.USER_DISLIKE_FILM_LOG, userId, filmId);
-
+    public boolean dislikeFilm(int filmId, int userId) {
+        return jdbcTemplate.update(SQL_QUERY_DISLIKE_FILM, filmId, userId) > 0;
     }
 
     @Override

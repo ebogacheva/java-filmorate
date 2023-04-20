@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchElementException;
-import ru.yandex.practicum.filmorate.exception.NotPerformedOperationException;
+import ru.yandex.practicum.filmorate.exception.NoSuchFilmorateElementException;
+import ru.yandex.practicum.filmorate.exception.NotPerformedFilmorateOperationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
@@ -32,7 +32,7 @@ public class UserService {
             return user.get();
         } else {
             log.warn(Constants.USER_NOT_FOUND_LOG, userId);
-            throw new NoSuchElementException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
+            throw new NoSuchFilmorateElementException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 
@@ -49,13 +49,13 @@ public class UserService {
             log.info(Constants.UPDATED_USER_LOG, updated.get().getId());
             return updated.get();
         } else {
-            throw new NotPerformedOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
+            throw new NotPerformedFilmorateOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
         }
     }
 
     public void delete(int id) {
-        if(!userDbStorage.delete(id)) {
-            throw new NotPerformedOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
+        if (!userDbStorage.delete(id)) {
+            throw new NotPerformedFilmorateOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
         }
         log.info(Constants.USER_DELETED_LOG, id);
     }

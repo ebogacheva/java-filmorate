@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchElementException;
+import ru.yandex.practicum.filmorate.exception.NoSuchFilmorateElementException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.db.filmMpa.FilmMpaStorage;
 import ru.yandex.practicum.filmorate.storage.db.mpa.MpaStorage;
@@ -24,7 +24,7 @@ public class MpaService {
         Optional<Mpa> mpa = mpaDbStorage.getMpaById(id);
         if (mpa.isPresent()) {
             return mpa.get();
-        } else throw new NoSuchElementException(Constants.RATING_MPA_NOT_FOUND_EXCEPTION_INFO);
+        } else throw new NoSuchFilmorateElementException(Constants.RATING_MPA_NOT_FOUND_EXCEPTION_INFO);
     }
 
     public List<Mpa> getAllMpa() {
@@ -43,6 +43,6 @@ public class MpaService {
         Optional<Mpa> mpa = filmMpaStorage.getFilmMpaById(filmId);
         if (mpa.isPresent()) {
             return mpa.get();
-        } else throw new NoSuchElementException(Constants.RATING_MPA_NOT_FOUND_EXCEPTION_INFO);
+        } else throw new NoSuchFilmorateElementException(Constants.RATING_MPA_NOT_FOUND_EXCEPTION_INFO);
     }
 }

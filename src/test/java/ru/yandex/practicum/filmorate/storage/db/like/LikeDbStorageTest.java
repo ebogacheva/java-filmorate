@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.db.like;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -23,17 +23,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Sql({"/likes.sql"})
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class LikeDbStorageTest {
-
-    private static final String SQL_QUERY_DELETE_LIKES = "DROP TABLE likes";
-    private static final String SQL_QUERY_CREATE_LIKES =
-            "CREATE TABLE IF NOT EXISTS likes " +
-                    "(film_id int REFERENCES film (id) ON DELETE CASCADE, " +
-                    "user_id int REFERENCES users_filmorate (id) ON DELETE CASCADE, " +
-                    "CONSTRAINT pk_likes PRIMARY KEY (film_id, user_id));";
 
     @Autowired
     private final LikeStorage likeDbStorage;
@@ -51,12 +45,6 @@ class LikeDbStorageTest {
     private final GenreStorage genreStorage;
 
     private final JdbcTemplate jdbcTemplate;
-
-    @BeforeEach
-    void beforeEach() {
-        jdbcTemplate.update(SQL_QUERY_DELETE_LIKES);
-        jdbcTemplate.update(SQL_QUERY_CREATE_LIKES);
-    }
 
     @Test
     void likeFilm() {

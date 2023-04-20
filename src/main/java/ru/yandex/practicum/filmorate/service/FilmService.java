@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchElementException;
-import ru.yandex.practicum.filmorate.exception.NotPerformedOperationException;
+import ru.yandex.practicum.filmorate.exception.NoSuchFilmorateElementException;
+import ru.yandex.practicum.filmorate.exception.NotPerformedFilmorateOperationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -41,7 +41,7 @@ public class FilmService {
             return film.get();
         } else {
             log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
-            throw new NoSuchElementException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
+            throw new NoSuchFilmorateElementException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 
@@ -62,12 +62,12 @@ public class FilmService {
         if (updatedFilm.isPresent()) {
             log.info(Constants.UPDATED_FILM_LOG, film.getId());
             return updatedFilm.get();
-        } else throw new NotPerformedOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
+        } else throw new NotPerformedFilmorateOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
     }
 
     public void delete(int filmId) {
-        if(!filmDbStorage.delete(filmId)) {
-            throw new NotPerformedOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
+        if (!filmDbStorage.delete(filmId)) {
+            throw new NotPerformedFilmorateOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
         }
         log.info(Constants.DELETED_FILM_LOG, filmId);
     }
@@ -77,7 +77,7 @@ public class FilmService {
         if (likeDbStorage.likeFilm(filmId, userId)) {
             log.info(Constants.USER_LIKE_FILM_LOG, userId, filmId);
             return getById(filmId);
-        } else throw new NotPerformedOperationException(Constants.LIKE_NOT_PERFORMED_OPERATION_INFO);
+        } else throw new NotPerformedFilmorateOperationException(Constants.LIKE_NOT_PERFORMED_OPERATION_INFO);
     }
 
     public Film dislike(int filmId, int userId) {
@@ -86,7 +86,7 @@ public class FilmService {
         if (likeDbStorage.dislikeFilm(filmId, userId)) {
             log.info(Constants.USER_DISLIKE_FILM_LOG, userId, filmId);
             return getById(filmId);
-        } else throw new NotPerformedOperationException(Constants.DISLIKE_NOT_PERFORMED_OPERATION_INFO);
+        } else throw new NotPerformedFilmorateOperationException(Constants.DISLIKE_NOT_PERFORMED_OPERATION_INFO);
     }
 
 

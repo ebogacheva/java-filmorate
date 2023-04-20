@@ -25,13 +25,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNoSuchFilm(final NoSuchElementException e) {
+    public Map<String, String> handleNoSuchFilm(final NoSuchFilmorateElementException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleFailedOperation(final NotPerformedOperationException e) {
+    public Map<String, String> handleFailedOperation(final NotPerformedFilmorateOperationException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
     }
 

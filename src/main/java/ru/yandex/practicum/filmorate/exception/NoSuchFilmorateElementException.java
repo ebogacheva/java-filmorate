@@ -3,9 +3,10 @@ package ru.yandex.practicum.filmorate.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class NotPerformedOperationException extends RuntimeException{
-    public NotPerformedOperationException(String s) {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class NoSuchFilmorateElementException extends RuntimeException {
+    public NoSuchFilmorateElementException(String s) {
         super(s);
     }
+
 }

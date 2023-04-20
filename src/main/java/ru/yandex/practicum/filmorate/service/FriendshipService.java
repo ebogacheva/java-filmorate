@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotPerformedOperationException;
+import ru.yandex.practicum.filmorate.exception.NotPerformedFilmorateOperationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.db.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
@@ -25,10 +25,10 @@ public class FriendshipService {
 
     public void sendFriendRequest(int userId, int friendId) {
         userService.checkUsersExistenceById(userId, friendId);
-        if(friendshipDbStorage.sendFriendRequest(userId, friendId)) {
+        if (friendshipDbStorage.sendFriendRequest(userId, friendId)) {
             log.info(Constants.SENT_FRIEND_REQUEST_LOG, userId, friendId);
         } else {
-            throw new NotPerformedOperationException(Constants.ADD_FRIEND_NOT_PERFORMED_EXCEPTION_INFO);
+            throw new NotPerformedFilmorateOperationException(Constants.ADD_FRIEND_NOT_PERFORMED_EXCEPTION_INFO);
         }
     }
 
@@ -37,7 +37,7 @@ public class FriendshipService {
         if (friendshipDbStorage.deleteFriend(userId, friendId)) {
             log.info(Constants.DELETE_FROM_FRIENDS_LOG, userId, friendId);
         } else {
-            throw new NotPerformedOperationException(Constants.FRIEND_DELETE_NOT_PERFORMED_EXCEPTION_INFO);
+            throw new NotPerformedFilmorateOperationException(Constants.FRIEND_DELETE_NOT_PERFORMED_EXCEPTION_INFO);
         }
     }
 
@@ -68,7 +68,7 @@ public class FriendshipService {
         if (friendshipDbStorage.confirmRequest(userId, otherId)) {
             log.info(Constants.CONFIRM_REQUEST_LOG, userId, otherId);
         } else {
-            throw new NotPerformedOperationException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
+            throw new NotPerformedFilmorateOperationException(Constants.FRIEND_REQUEST_NOT_FOUND_EXCEPTION_INFO);
         }
     }
 

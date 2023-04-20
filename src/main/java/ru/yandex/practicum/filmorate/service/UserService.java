@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exception.NoSuchFilmorateElementException;
+import ru.yandex.practicum.filmorate.exception.NotPerformedFilmorateOperationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
@@ -17,67 +17,50 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    private UserStorage inMemoryUserStorage;
+    private UserStorage userDbStorage;
 
     public User create(User user) {
         String name = getCorrectName(user);
         User userWithCorrectName = user.withName(name);
-        return inMemoryUserStorage.create(userWithCorrectName);
-    }
-
-    public List<User> findAll() {
-        return inMemoryUserStorage.findAll();
-    }
-
-    public User put(User user) {
-        checkUsersExistenceById(user.getId());
-        String name = getCorrectName(user);
-        User userUpdated = user.withName(name);
-        log.info("Обновлен пользователь: {}", userUpdated.getId());
-        return inMemoryUserStorage.put(userUpdated);
-    }
-
-    public void addFriend(int userId, int friendId) {
-        checkUsersExistenceById(userId, friendId);
-        User user = inMemoryUserStorage.getById(userId);
-        User friend = inMemoryUserStorage.getById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        log.info("Теперь друзья: {} и {}", userId, friendId);
-    }
-
-    public void deleteFriend(int userId, int friendId) {
-        checkUsersExistenceById(userId, friendId);
-        User user = inMemoryUserStorage.getById(userId);
-        User friend = inMemoryUserStorage.getById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        log.info("Больше не друзья: {} и {}", userId, friendId);
-    }
-
-    public List<User> friends(int userId) {
-        checkUsersExistenceById(userId);
-        Set<Integer> friendsId = inMemoryUserStorage.getById(userId).getFriends();
-        log.info("У пользователя {} - {} друзей.", userId, friendsId.size());
-        return getFriendsList(new ArrayList<>(emptyIfNull(friendsId)));
-    }
-
-    public List<User> commonFriends(int userId, int otherId) {
-        checkUsersExistenceById(userId, otherId);
-        Collection<Integer> userFriends = emptyIfNull(inMemoryUserStorage.getById(userId).getFriends());
-        Collection<Integer> otherFriends = emptyIfNull(inMemoryUserStorage.getById(otherId).getFriends());
-        List<Integer> intersection = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
-        log.info("Общие друзья {} и {}: {}.", userId, otherId, intersection);
-        return getFriendsList(intersection);
+        return userDbStorage.create(userWithCorrectName);
     }
 
     public User getById(int userId) {
-        checkUsersExistenceById(userId);
-        log.info("Найден пользователь: {}", userId);
-        return inMemoryUserStorage.getById(userId);
+        Optional<User> user = userDbStorage.getById(userId);
+        if (user.isPresent()) {
+            log.info(Constants.GOT_USER_BY_ID_LOG, userId);
+            return user.get();
+        } else {
+            log.warn(Constants.USER_NOT_FOUND_LOG, userId);
+            throw new NoSuchFilmorateElementException(Constants.USER_NOT_FOUND_EXCEPTION_INFO);
+        }
     }
 
-    private List<User> getFriendsList(List<Integer> ids) {
+    public List<User> findAll() {
+        return userDbStorage.findAll();
+    }
+
+    public User update(User user) {
+        checkUsersExistenceById(user.getId());
+        String name = getCorrectName(user);
+        User userWithCorrectName = user.withName(name);
+        Optional<User> updated = userDbStorage.update(userWithCorrectName);
+        if (updated.isPresent()) {
+            log.info(Constants.UPDATED_USER_LOG, updated.get().getId());
+            return updated.get();
+        } else {
+            throw new NotPerformedFilmorateOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
+        }
+    }
+
+    public void delete(int id) {
+        if (!userDbStorage.delete(id)) {
+            throw new NotPerformedFilmorateOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
+        }
+        log.info(Constants.USER_DELETED_LOG, id);
+    }
+
+    public List<User> getUsersList(List<Integer> ids) {
         return findAll().stream()
                 .filter(user -> ids.contains(user.getId()))
                 .collect(Collectors.toList());
@@ -85,10 +68,7 @@ public class UserService {
 
     public void checkUsersExistenceById(int...userIds) {
         for (int id : userIds) {
-            if (Objects.isNull(inMemoryUserStorage.getById(id))) {
-                log.info("Пользователь не найден: {}", id);
-                throw new NoSuchUserException(Constants.USER_NOT_FOUND_INFO);
-            }
+            getById(id);
         }
     }
 
@@ -99,5 +79,4 @@ public class UserService {
         }
         return name;
     }
-
 }

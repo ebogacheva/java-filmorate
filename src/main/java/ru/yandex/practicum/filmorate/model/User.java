@@ -5,14 +5,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Email;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.With;
+import lombok.*;
 import ru.yandex.practicum.filmorate.model.annotations.UserLoginValidation;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -32,5 +30,13 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
-    private final Set<Integer> friends = new HashSet<>();
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("EMAIL", this.getEmail());
+        values.put("LOGIN", this.getLogin());
+        values.put("NAME",this.getName());
+        values.put("BIRTHDAY", this.getBirthday());
+        return values;
+    }
 }

@@ -6,12 +6,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.controller.GenreController;
+import ru.yandex.practicum.filmorate.controller.MpaController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class, MethodArgumentNotValidException.class})
+@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class, GenreController.class,
+        MpaController.class, MethodArgumentNotValidException.class})
 public class ErrorHandler {
 
     @ExceptionHandler
@@ -22,13 +25,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNoSuchUser(final NoSuchUserException e) {
+    public Map<String, String> handleNoSuchFilm(final NoSuchFilmorateElementException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNoSuchFilm(final NoSuchFilmException e) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleFailedOperation(final NotPerformedFilmorateOperationException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
     }
 
@@ -43,7 +46,4 @@ public class ErrorHandler {
     public Map<String, String> handleRuntimeException(final RuntimeException e) {
         return Map.of(Constants.ERROR_MESSAGE, e.getMessage());
     }
-
-
-
 }

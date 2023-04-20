@@ -1,0 +1,39 @@
+package ru.yandex.practicum.filmorate.storage.db.like;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.utils.FilmorateRowMappers;
+
+import java.util.List;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class LikeDbStorage implements LikeStorage {
+
+    private static final String SQL_QUERY_LIKE_FILM =
+            "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+    private static final String SQL_QUERY_DISLIKE_FILM =
+            "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
+    private static final String SQL_QUERY_GET_ALL_FILM_LIKES =
+            "SELECT user_id FROM likes WHERE film_id = ?";
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public boolean likeFilm(int filmId, int userId) {
+        return jdbcTemplate.update(SQL_QUERY_LIKE_FILM, filmId, userId) > 0;
+    }
+
+    @Override
+    public boolean dislikeFilm(int filmId, int userId) {
+        return jdbcTemplate.update(SQL_QUERY_DISLIKE_FILM, filmId, userId) > 0;
+    }
+
+    @Override
+    public List<Integer> getAllFilmLikes(int filmId) {
+        return jdbcTemplate.query(SQL_QUERY_GET_ALL_FILM_LIKES, FilmorateRowMappers::getUserId, filmId);
+    }
+}

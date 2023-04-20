@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FriendshipService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -37,6 +38,9 @@ public class UserValidationTest {
 
     @MockBean
     private UserStorage userStorage;
+
+    @MockBean
+    private FriendshipService friendshipService;
 
     private HttpStatus postChecking(User user) throws Exception {
         MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/users")

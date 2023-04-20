@@ -3,13 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchFilmException;
+import ru.yandex.practicum.filmorate.exception.NoSuchFilmorateElementException;
+import ru.yandex.practicum.filmorate.exception.NotPerformedFilmorateOperationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.db.like.LikeDbStorage;
 import ru.yandex.practicum.filmorate.utils.Constants;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,62 +20,89 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     @Autowired
-    private FilmStorage inMemoryFilmStorage;
+    private FilmStorage filmDbStorage;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LikeDbStorage likeDbStorage;
+
     public Film create(Film film) {
-        log.info("Добавлен фильм {}", film);
-        return inMemoryFilmStorage.create(film);
+        Film createdFilm = filmDbStorage.create(film);
+        log.info(Constants.FILM_ADDED_LOG, film);
+        return createdFilm;
+    }
+
+    public Film getById(int filmId) {
+        Optional<Film> film = filmDbStorage.getById(filmId);
+        if (film.isPresent()) {
+            log.info(Constants.GOT_FILM_BY_ID, filmId);
+            return film.get();
+        } else {
+            log.info(Constants.FILM_NOT_FOUND_LOG, filmId);
+            throw new NoSuchFilmorateElementException(Constants.FILM_NOT_FOUND_EXCEPTION_INFO);
+        }
     }
 
     public List<Film> findAll() {
-        return inMemoryFilmStorage.findAll();
+        return filmDbStorage.findAll();
     }
 
-    public Film put(Film film) {
-        if (Objects.isNull(inMemoryFilmStorage.getById(film.getId()))) {
-            throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
+    public List<User> getAllFilmLikes(int filmId) {
+        checkFilmsExistenceById(filmId);
+        List<Integer> likes = likeDbStorage.getAllFilmLikes(filmId);
+        log.info(Constants.USERS_LIKES_LOG, filmId, likes.size());
+        return userService.getUsersList(likes);
+    }
+
+    public Film update(Film film) {
+        checkFilmsExistenceById(film.getId());
+        Optional<Film> updatedFilm = filmDbStorage.update(film);
+        if (updatedFilm.isPresent()) {
+            log.info(Constants.UPDATED_FILM_LOG, film.getId());
+            return updatedFilm.get();
+        } else throw new NotPerformedFilmorateOperationException(Constants.UPDATE_NOT_PERFORMED_EXCEPTION_INFO);
+    }
+
+    public void delete(int filmId) {
+        if (!filmDbStorage.delete(filmId)) {
+            throw new NotPerformedFilmorateOperationException(Constants.DELETE_NOT_PERFORMED_EXCEPTION_INFO);
         }
-        log.info("Обновлена информация о фильме {}", film);
-        return inMemoryFilmStorage.put(film);
+        log.info(Constants.DELETED_FILM_LOG, filmId);
     }
 
-    public Film like(int id, int userId) {
-        checkFilmsExistenceById(id);
-        userService.checkUsersExistenceById(userId);
-        inMemoryFilmStorage.getById(id).getLikes().add(userId);
-        log.info("Фильм {} нравится {} пользователям", id, userId);
-        return inMemoryFilmStorage.getById(id);
+    public Film like(int filmId, int userId) {
+        checkFilmsExistenceById(filmId);
+        if (likeDbStorage.likeFilm(filmId, userId)) {
+            log.info(Constants.USER_LIKE_FILM_LOG, userId, filmId);
+            return getById(filmId);
+        } else throw new NotPerformedFilmorateOperationException(Constants.LIKE_NOT_PERFORMED_OPERATION_INFO);
     }
 
-    public Film dislike(int id, int userId) {
-        checkFilmsExistenceById(id);
+    public Film dislike(int filmId, int userId) {
+        checkFilmsExistenceById(filmId);
         userService.checkUsersExistenceById(userId);
-        inMemoryFilmStorage.getById(id).getLikes().remove(userId);
-        log.info("Фильм {} больше не нравится пользователю {}", id, userId);
-        return inMemoryFilmStorage.getById(id);
+        if (likeDbStorage.dislikeFilm(filmId, userId)) {
+            log.info(Constants.USER_DISLIKE_FILM_LOG, userId, filmId);
+            return getById(filmId);
+        } else throw new NotPerformedFilmorateOperationException(Constants.DISLIKE_NOT_PERFORMED_OPERATION_INFO);
     }
+
 
     public List<Film> popular(int count) {
-        return inMemoryFilmStorage.findAll()
+        return filmDbStorage.findAll()
                 .stream()
-                .sorted((film, film2) -> -(film.getLikes().size() - film2.getLikes().size()))
+                .sorted((film, film2) ->
+                        -(getAllFilmLikes(film.getId()).size()
+                                - getAllFilmLikes(film2.getId()).size()))
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    public Film getById(int filmId) {
-        checkFilmsExistenceById(filmId);
-        return inMemoryFilmStorage.getById(filmId);
-    }
-
-    private void checkFilmsExistenceById(int...filmIds) {
+    public void checkFilmsExistenceById(int...filmIds) {
         for (int id : filmIds) {
-            if (Objects.isNull(inMemoryFilmStorage.getById(id))) {
-                throw new NoSuchFilmException(Constants.FILM_NOT_FOUND_INFO);
-            }
+            getById(id);
         }
     }
 }
